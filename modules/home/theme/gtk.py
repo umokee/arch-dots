@@ -13,7 +13,7 @@ def apply(conf: dict, helpers) -> None:
         "nwg-look",
     )
 
-    add_aur("adw-gtk3")
+    add_aur("adw-gtk-theme-git")
 
     dot_dir(helpers.username, ".config/gtk-3.0")
     dot_dir(helpers.username, ".config/gtk-4.0")
