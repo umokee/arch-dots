@@ -27,7 +27,6 @@ def apply(conf: dict, helpers) -> None:
         "wofi",
         "nemo",
         "xarchiver",
-        "ly",
         "kitty",
     )
 

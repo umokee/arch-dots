@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from shared.lib import enable_units, system_file
+from shared.lib import add_packages, enable_units, system_file
 
 
 def apply(conf: dict, helpers) -> None:
     if not helpers.is_wm:
         return
+
+    add_packages("ly")
 
     enable_units("ly.service")
 
