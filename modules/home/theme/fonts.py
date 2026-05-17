@@ -16,5 +16,5 @@ def apply(conf: dict, helpers) -> None:
     )
 
     add_aur(
-        "ttf-cascadia-code",
+        "ttf-cascadia-code-git",
     )
