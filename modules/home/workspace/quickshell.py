@@ -15,7 +15,7 @@ def apply(conf: dict, helpers) -> None:
         "qt6-svg",
     )
 
-    add_aur("quickshell")
+    add_aur("quickshell-git")
 
     dot_dir(helpers.username, ".config/quickshell")
 
