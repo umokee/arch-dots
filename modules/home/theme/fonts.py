@@ -8,7 +8,7 @@ def apply(conf: dict, helpers) -> None:
         "ttf-firacode-nerd",
         "ttf-hack-nerd",
         "ttf-jetbrains-mono-nerd",
-        "ttf-font-awesome",
+        "otf-font-awesome",
         "ttf-roboto",
         "ttf-montserrat",
         "ttf-opensans",

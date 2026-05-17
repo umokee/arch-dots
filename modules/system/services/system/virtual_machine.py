@@ -17,7 +17,7 @@ def apply(conf: dict, helpers) -> None:
         "libguestfs",
         "edk2-ovmf",
         "iproute2",
-        "iptables-nft",
+        "iptables",
     )
 
     enable_units("libvirtd.service")
