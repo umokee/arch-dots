@@ -29,7 +29,7 @@ def apply(conf: dict, helpers) -> None:
         "czkawka-gui",
         "mullvad-browser",
         "xmind",
-        "vial",
+        # "vial",
         "stretchly",
         "pgadmin4",
         "codex-bin",
