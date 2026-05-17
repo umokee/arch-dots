@@ -25,7 +25,6 @@ def apply(conf: dict, helpers) -> None:
         "pgmodeler",
         "winboat",
         "spotify",
-        "amphetype",
         "czkawka-gui",
         "mullvad-browser",
         "xmind",
