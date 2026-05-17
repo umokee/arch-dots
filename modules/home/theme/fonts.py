@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from shared.lib import add_packages
+from shared.lib import add_aur, add_packages
 
 
 def apply(conf: dict, helpers) -> None:
@@ -10,8 +10,11 @@ def apply(conf: dict, helpers) -> None:
         "ttf-jetbrains-mono-nerd",
         "ttf-font-awesome",
         "ttf-roboto",
-        "ttf-inter",
         "ttf-montserrat",
         "ttf-opensans",
         "inter-font",
+    )
+
+    add_aur(
+        "ttf-cascadia-code",
     )

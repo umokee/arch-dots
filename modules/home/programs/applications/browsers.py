@@ -12,7 +12,6 @@ def apply(conf: dict, helpers) -> None:
 
     add_packages(
         "firefox",
-        "cascadia-code",
     )
 
     add_aur(

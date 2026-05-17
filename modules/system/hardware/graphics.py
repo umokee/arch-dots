@@ -10,7 +10,7 @@ def apply(conf: dict, helpers) -> None:
     add_packages(
         "mesa",
         "libglvnd",
-        "vulkan-loader",
+        # "vulkan-loader",
         "vulkan-validation-layers",
         "libva-utils",
     )

@@ -16,7 +16,7 @@ def apply(conf: dict, helpers) -> None:
         "openbsd-netcat",
         "libguestfs",
         "edk2-ovmf",
-        "bridge-utils",
+        "iproute2",
         "iptables-nft",
     )
 

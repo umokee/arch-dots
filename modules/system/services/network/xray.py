@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from shared.lib import add_packages, system_file
+from shared.lib import add_aur, system_file
 
 
 def apply(conf: dict, helpers) -> None:
     if not helpers.has_in("services", "xray"):
         return
 
-    add_packages("xray")
+    add_aur("xray")
 
     system_file(
         "/etc/xray/config.json",

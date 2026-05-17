@@ -12,7 +12,7 @@ def apply(conf: dict, helpers) -> None:
         "vulkan-intel",
         "intel-media-driver",
         "libva-intel-driver",
-        "libva-vdpau-driver",
+        # "libva-vdpau-driver",
         "libvdpau-va-gl",
         "intel-gpu-tools",
     )
