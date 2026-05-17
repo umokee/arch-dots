@@ -1,0 +1,45 @@
+[user]
+    name = umokee
+    email = hituaev@gmail.com
+
+[init]
+    defaultBranch = main
+
+[core]
+    editor = nvim
+    autocrlf = input
+    whitespace = trailing-space,space-before-tab
+
+[pull]
+    rebase = false
+
+[push]
+    autoSetupRemote = true
+    default = simple
+
+[merge]
+    conflictStyle = zdiff3
+
+[diff]
+    colorMoved = default
+
+[color]
+    ui = auto
+
+[status]
+    short = true
+    branch = true
+    showStash = true
+
+[log]
+    date = local
+
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    ci = commit
+    lg = log --oneline --graph --decorate --all
+    last = log -1 HEAD --stat
+    unstage = reset HEAD --
+    amend = commit --amend

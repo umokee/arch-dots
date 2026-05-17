@@ -1,0 +1,3 @@
+module Services
+
+HardwareService 1.0 HardwareService.qml

@@ -1,0 +1,56 @@
+from __future__ import annotations
+
+from shared.lib import add_packages, system_file, user_systemd_unit
+
+
+def apply(conf: dict, helpers) -> None:
+    if not (helpers.is_wm and helpers.is_wayland):
+        return
+
+    username = helpers.username
+    home = f"/home/{username}"
+
+    add_packages("kanshi")
+
+    system_file(
+        f"{home}/.config/kanshi/config",
+        _kanshi_config(),
+        owner=username,
+    )
+
+    user_systemd_unit(
+        username,
+        "kanshi.service",
+        _kanshi_unit(),
+    )
+
+
+def _kanshi_unit() -> str:
+    return """
+[Unit]
+Description=Kanshi output auto configuration
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/kanshi
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target
+"""
+
+
+def _kanshi_config() -> str:
+    return """
+profile desktop {
+  output "CMT GA241 CMI231603659" mode 1920x1080@60.00 position 0,0 scale 1.0
+  output "Shenzhen KTC Technology Group VG2710PQU 0x00000001" mode 2560x1440@165.00 position 1920,-360 scale 1.0
+  output "GWD ARZOPA 0000000713942" mode 1920x1080@60.00 position 1440,1080 scale 1.0
+}
+
+profile laptop {
+  output eDP-1 mode 2560x1440@60.00 position 0,0 scale 1.0
+}
+"""

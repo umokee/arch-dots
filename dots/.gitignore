@@ -1,0 +1,29 @@
+# Secrets
+home/.ssh/*
+!home/.ssh/config
+
+# Logs
+*.log
+*.bak
+*.backup
+*.old
+*.tmp
+
+# Editor
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.tar.xz
+
+# Local state
+state/
+cache/
