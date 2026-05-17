@@ -72,7 +72,6 @@ HOSTS = {
                 "appimage",
                 "browsers",
                 "dev",
-                "tmux",
                 "shell",
             ]
         },

@@ -9,6 +9,4 @@ def apply(conf: dict, helpers) -> None:
         "adwaita-icon-theme",
     )
 
-    add_aur("tela-circle-icon-theme")
-
-
+    add_aur("tela-circle-icon-theme-blue-git")
