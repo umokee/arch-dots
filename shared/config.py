@@ -71,6 +71,7 @@ HOSTS = {
                 "gaming",
                 "appimage",
                 "browsers",
+                "terminal",
                 "dev",
                 "shell",
             ]
