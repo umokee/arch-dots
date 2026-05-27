@@ -1,0 +1,12 @@
+[Unit]
+Description=Attach arch-toml PostgreSQL config
+After=postgresql-first-init.service
+Before=postgresql.service
+ConditionPathExists=/var/lib/postgres/data/postgresql.conf
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -lc 'grep -q "^include_if_exists = '\''/etc/postgresql/local.conf'\''" /var/lib/postgres/data/postgresql.conf || echo "include_if_exists = '\''/etc/postgresql/local.conf'\''" >> /var/lib/postgres/data/postgresql.conf'
+
+[Install]
+WantedBy=multi-user.target

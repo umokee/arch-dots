@@ -1,0 +1,84 @@
+hostname = "archlinux"
+username = "user"
+machine_type = "server"
+color_scheme = "dark"
+wallpaper_name = "backyard"
+fallback_kernel = true
+features = [
+  "base.boot",
+  "base.system",
+  "base.security",
+  "base.locale",
+  "base.network",
+  "base.users",
+  "base.packages",
+  "base.secrets",
+  "base.cleanup",
+  "programs.git",
+  "programs.ssh",
+  "programs.shell",
+  "services.postgresql",
+  "services.openssh",
+  "services.xray",
+  "services.fail2ban",
+  "services.fstrim",
+]
+
+[default]
+terminal = "foot"
+editor = "nvim"
+visual = "nvim"
+browser = "zen"
+
+[cachyos]
+bootstrap_repos = true
+repo_installer_url = "https://mirror.cachyos.org/cachyos-repo.tar.xz"
+repo_target = "v4"
+include_base_repo = true
+kernel = "linux-cachyos-eevdf-lto"
+kernel_headers = "linux-cachyos-eevdf-lto-headers"
+kernel_extra_packages = ["linux-cachyos-eevdf-lto-nvidia-open"]
+install_settings = true
+manage_pacman_conf = false
+
+[paths]
+sops_age_key = "/etc/key.txt"
+
+[ignore]
+pacman = ["yay"]
+foreign = ["yay", "decman", "aconfmgr-git"]
+
+[prune]
+protected = []
+protect_patterns = ["linux*", "nvidia*", "cachyos*"]
+
+[kernel]
+params = ["quiet", "splash", "nosplit_lock_mitigate"]
+
+[user]
+shell = "/usr/bin/bash"
+groups = ["wheel", "networkmanager", "input"]
+
+[sudo]
+wheel_policy = "%wheel ALL=(ALL:ALL) NOPASSWD: ALL"
+
+[zram]
+size = "ram * 1.5"
+
+[ssh]
+permit_root_login = "prohibit-password"
+
+[tlp]
+conf = """# Managed by archctl
+
+CPU_SCALING_GOVERNOR_ON_AC=performance
+WIFI_PWR_ON_AC=off
+USB_AUTOSUSPEND=0
+"""
+
+[quickshell]
+screen = "eDP-1"
+workspace_count = 10
+panel_height = 60
+content_height = 40
+auto_hide = false

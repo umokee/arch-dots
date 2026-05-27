@@ -1,0 +1,12 @@
+[Unit]
+Description=Initialize PostgreSQL database if needed
+Before=postgresql.service
+ConditionPathExists=!/var/lib/postgres/data/PG_VERSION
+
+[Service]
+Type=oneshot
+User=postgres
+ExecStart=/usr/bin/initdb -D /var/lib/postgres/data --locale=en_US.UTF-8 -E UTF8
+
+[Install]
+WantedBy=multi-user.target

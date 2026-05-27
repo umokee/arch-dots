@@ -1,0 +1,24 @@
+id = "services.openssh"
+description = "Migrated feature services.openssh"
+
+[packages]
+pacman = ["openssh"]
+aur = []
+
+[[dirs]]
+target = "/etc/ssh/sshd_config.d"
+permissions = "755"
+
+[[files]]
+source = "templates/sshd-config.j2"
+target = "/etc/ssh/sshd_config.d/10-arch-toml.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "sshd.service"
+enable = true
+start = true

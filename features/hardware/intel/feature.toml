@@ -1,0 +1,27 @@
+id = "hardware.intel"
+description = "Migrated feature hardware.intel"
+
+[packages]
+pacman = [
+  "intel-ucode",
+  "vulkan-intel",
+  "intel-media-driver",
+  "libva-intel-driver",
+  "libvdpau-va-gl",
+  "intel-gpu-tools",
+]
+aur = []
+
+[[dirs]]
+target = "/etc/environment.d"
+permissions = "755"
+
+[[files]]
+source = "templates/intel-env.j2"
+target = "/etc/environment.d/30-intel-graphics.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+condition_feature_absent = "hardware.nvidia"

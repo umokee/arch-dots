@@ -1,0 +1,24 @@
+id = "hardware.keyboard-mouse"
+description = "Migrated feature hardware.keyboard-mouse"
+
+[packages]
+pacman = [
+  "libinput",
+  "xorg-xinput",
+  "wev",
+  "xkeyboard-config",
+]
+aur = []
+
+[[dirs]]
+target = "/usr/share/X11/xkb/symbols"
+permissions = "755"
+
+[[files]]
+source = "templates/xkb-ru-custom-symbols.j2"
+target = "/usr/share/X11/xkb/symbols/ru-custom"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"

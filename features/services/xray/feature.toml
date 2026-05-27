@@ -1,0 +1,37 @@
+id = "services.xray"
+description = "Migrated feature services.xray"
+
+[packages]
+pacman = ["curl"]
+aur = ["xray-bin"]
+
+[[dirs]]
+target = "/etc/xray"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/systemd/system"
+permissions = "755"
+
+[[files]]
+source = "templates/xray-config.j2"
+target = "/etc/xray/config.json"
+mode = "template"
+type = "file"
+owner = "root"
+group = "wheel"
+permissions = "440"
+
+[[files]]
+source = "templates/xray-service.j2"
+target = "/etc/systemd/system/xray.service"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[hooks]]
+name = "xray-assets"
+script = "xray-assets.sh"
+run = "post"

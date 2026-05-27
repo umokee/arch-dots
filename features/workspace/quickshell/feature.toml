@@ -1,0 +1,48 @@
+id = "workspace.quickshell"
+description = "Migrated feature workspace.quickshell"
+
+[packages]
+pacman = [
+  "qt6-base",
+  "qt6-declarative",
+  "qt6-wayland",
+  "qt6-svg",
+]
+aur = ["quickshell-git"]
+
+[[dirs]]
+target = "~/.config/quickshell"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config/systemd/user"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config"
+permissions = "755"
+
+[[files]]
+source = "templates/quickshell-host-config.j2"
+target = "~/.config/quickshell/HostConfig.qml"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/quickshell-service.j2"
+target = "~/.config/systemd/user/quickshell.service"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "files/home/.config/quickshell"
+target = "~/.config/quickshell"
+mode = "link"
+type = "dir"
+
+[[systemd.user]]
+unit = "quickshell.service"
+enable = true
+start = true

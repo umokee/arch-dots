@@ -1,0 +1,6 @@
+id = "programs.browsers"
+description = "Migrated feature programs.browsers"
+
+[packages]
+pacman = ["firefox"]
+aur = ["zen-browser-bin"]

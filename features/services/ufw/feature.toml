@@ -1,0 +1,11 @@
+id = "services.ufw"
+description = "Migrated feature services.ufw"
+
+[packages]
+pacman = ["ufw"]
+aur = []
+
+[[systemd.system]]
+unit = "ufw.service"
+enable = true
+start = true

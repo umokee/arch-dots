@@ -1,0 +1,22 @@
+id = "workspace.wallpapers"
+description = "Migrated feature workspace.wallpapers"
+
+[packages]
+pacman = ["swaybg"]
+aur = []
+
+[[dirs]]
+target = "~/.config/systemd/user"
+permissions = "755"
+
+[[files]]
+source = "templates/swaybg-daemon-service.j2"
+target = "~/.config/systemd/user/swaybg-daemon.service"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[systemd.user]]
+unit = "swaybg-daemon.service"
+enable = true
+start = true

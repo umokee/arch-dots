@@ -1,0 +1,44 @@
+id = "base.system"
+description = "Migrated feature base.system"
+
+[packages]
+pacman = ["dbus-broker", "zram-generator"]
+aur = []
+
+[[dirs]]
+target = "/etc/systemd"
+permissions = "755"
+
+[[files]]
+source = "templates/zram-generator.j2"
+target = "/etc/systemd/zram-generator.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "getty@.service"
+enable = true
+start = true
+
+[[systemd.system]]
+unit = "dbus-broker.service"
+enable = true
+start = true
+
+[[systemd.system]]
+unit = "systemd-timesyncd.service"
+enable = true
+start = true
+
+[[systemd.system]]
+unit = "systemd-userdbd.socket"
+enable = true
+start = true
+
+[[systemd.system]]
+unit = "remote-fs.target"
+enable = true
+start = true

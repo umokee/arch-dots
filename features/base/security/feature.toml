@@ -1,0 +1,45 @@
+id = "base.security"
+description = "Migrated feature base.security"
+
+[packages]
+pacman = ["polkit"]
+aur = []
+
+[[dirs]]
+target = "/etc/sudoers.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/security/limits.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/security"
+permissions = "755"
+
+[[files]]
+source = "templates/sudoers-user-policy.j2"
+target = "/etc/sudoers.d/00-user-policy"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "440"
+
+[[files]]
+source = "templates/limits-user-nice.j2"
+target = "/etc/security/limits.d/90-user-nice.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/faillock-conf.j2"
+target = "/etc/security/faillock.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"

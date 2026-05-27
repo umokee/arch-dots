@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "== Pacman cache =="
+sudo paccache -rk2 || true
+sudo paccache -ruk0 || true
+
+echo
+echo "== Orphans =="
+orphans="$(pacman -Qdtq || true)"
+if [ -n "$orphans" ]; then
+  echo "$orphans"
+  read -rp "Remove orphans? [y/N] " answer
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    echo "$orphans" | sudo pacman -Rns -
+  fi
+else
+  echo "No orphans."
+fi
+
+echo
+echo "== Pacdiff =="
+sudo pacdiff || true
+
+echo
+echo "== Journal cleanup =="
+sudo journalctl --vacuum-time=14d

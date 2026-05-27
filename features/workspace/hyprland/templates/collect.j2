@@ -1,0 +1,193 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DIR="."
+OUT="merged_output.txt"
+EXTS=()
+EXCLUDES=(".git" ".venv" "venv" "node_modules" "__pycache__" "generated" "state" "cache" "dist" "build" "target")
+RELATIVE_TO=""
+SECTION_TITLE=""
+
+add_exts() {
+  local raw="$1"
+  raw="${raw//,/ }"
+  for ext in $raw; do
+    ext="${ext#.}"
+    [ -n "$ext" ] && EXTS+=("$ext")
+  done
+}
+
+add_excludes() {
+  local raw="$1"
+  raw="${raw//,/ }"
+  for item in $raw; do
+    [ -n "$item" ] && EXCLUDES+=("$item")
+  done
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -d|--dir)
+      DIR="${2:?missing directory}"
+      shift 2
+      ;;
+
+    -o|--output)
+      OUT="${2:?missing output file}"
+      shift 2
+      ;;
+
+    -e|--ext|--extensions)
+      add_exts "${2:?missing extensions}"
+      shift 2
+      ;;
+
+    --exclude|--excluded-dirs)
+      add_excludes "${2:?missing excluded dirs}"
+      shift 2
+      ;;
+
+    --relative-to)
+      RELATIVE_TO="${2:?missing relative base}"
+      shift 2
+      ;;
+
+    --section-title)
+      SECTION_TITLE="${2:?missing section title}"
+      shift 2
+      ;;
+
+    --no-fences|--diploma)
+      shift
+      ;;
+
+    -h|--help)
+      cat <<HELP
+Usage:
+  collect -d DIR -e "py toml qml sh" -o merged_output.txt
+  collect DIR "py toml qml sh" merged_output.txt ".git .venv node_modules generated"
+
+Options:
+  -d, --dir DIR
+  -e, --ext "py toml"
+  -o, --output FILE
+  --exclude ".git node_modules"
+  --relative-to DIR
+  --section-title TEXT
+HELP
+      exit 0
+      ;;
+
+    *)
+      if [[ "$DIR" == "." && -d "$1" ]]; then
+        DIR="$1"
+      elif [[ ${#EXTS[@]} -eq 0 ]]; then
+        add_exts "$1"
+      elif [[ "$OUT" == "merged_output.txt" ]]; then
+        OUT="$1"
+      else
+        add_excludes "$1"
+      fi
+      shift
+      ;;
+  esac
+done
+
+if [[ ! -d "$DIR" ]]; then
+  echo "Error: directory does not exist: $DIR" >&2
+  exit 1
+fi
+
+mkdir -p "$(dirname "$OUT")"
+: > "$OUT"
+
+{
+  [ -n "$SECTION_TITLE" ] && echo "# $SECTION_TITLE" && echo
+  echo "Source directory: $DIR"
+  echo "Extensions: ${EXTS[*]:-(all text files)}"
+  echo "Generated at: $(date -Is)"
+  echo
+} >> "$OUT"
+
+should_skip_path() {
+  local file="$1"
+  local ex
+  for ex in "${EXCLUDES[@]}"; do
+    [[ "$file" == */"$ex"/* || "$file" == */"$ex" ]] && return 0
+  done
+  return 1
+}
+
+ext_allowed() {
+  local file="$1"
+
+  [[ ${#EXTS[@]} -eq 0 ]] && return 0
+
+  local name="${file##*/}"
+  local ext=""
+
+  [[ "$name" == *.* ]] && ext="${name##*.}"
+
+  local wanted
+  for wanted in "${EXTS[@]}"; do
+    [[ "$ext" == "$wanted" ]] && return 0
+  done
+
+  return 1
+}
+
+make_display_path() {
+  local file="$1"
+
+  if [[ -n "$RELATIVE_TO" ]] && command -v realpath >/dev/null 2>&1; then
+    realpath --relative-to="$RELATIVE_TO" "$file" 2>/dev/null || printf '%s\n' "$file"
+  else
+    printf '%s\n' "$file"
+  fi
+}
+
+COUNT=0
+SKIPPED=0
+
+while IFS= read -r -d '' file; do
+  [[ "$file" == "$OUT" ]] && continue
+
+  if should_skip_path "$file"; then
+    ((SKIPPED++)) || true
+    continue
+  fi
+
+  if ! ext_allowed "$file"; then
+    ((SKIPPED++)) || true
+    continue
+  fi
+
+  if ! LC_ALL=C grep -Iq . "$file" 2>/dev/null; then
+    echo "Skip binary: $file" >&2
+    ((SKIPPED++)) || true
+    continue
+  fi
+
+  display_path="$(make_display_path "$file")"
+
+  {
+    echo "================== BEGIN FILE =================="
+    echo "Path: $display_path"
+    echo "================================================"
+    echo
+    cat "$file"
+    echo
+    echo "=================== END FILE ==================="
+    echo
+    echo
+  } >> "$OUT"
+
+  echo "Collected: $display_path"
+  ((COUNT++)) || true
+done < <(find "$DIR" -type f -print0 | sort -z)
+
+echo
+echo "Done."
+echo "Files collected: $COUNT"
+echo "Files skipped: $SKIPPED"
+echo "Output: $OUT"

@@ -1,0 +1,167 @@
+hostname = "archlinux"
+username = "user"
+machine_type = "desktop"
+color_scheme = "dark"
+wallpaper_name = "backyard"
+fallback_kernel = true
+features = [
+  "base.boot",
+  "base.system",
+  "base.security",
+  "base.locale",
+  "base.network",
+  "base.fonts",
+  "base.packages",
+  "base.secrets",
+  "base.cleanup",
+  "hardware.graphics",
+  "hardware.sound",
+  "hardware.keyboard-mouse",
+  "hardware.intel",
+  "hardware.nvidia",
+  "hardware.power",
+  "hardware.print",
+  "workspace.hyprland",
+  "workspace.kanshi",
+  "workspace.display-manager",
+  "workspace.quickshell",
+  "workspace.tofi",
+  "workspace.dunst",
+  "workspace.xdg",
+  "workspace.themes",
+  "workspace.wallpapers",
+  "programs.git",
+  "programs.ssh",
+  "programs.nvim",
+  "programs.vscode",
+  "programs.lsp",
+  "programs.gaming",
+  "programs.appimage",
+  "programs.browsers",
+  "programs.terminal",
+  "programs.dev",
+  "programs.apps",
+  "programs.files",
+  "programs.shell",
+  "services.postgresql",
+  "services.virtual-machine",
+  "services.xray",
+  "services.openssh",
+  "services.gammastep",
+  "services.file-management",
+  "services.fstrim",
+  "services.kanata",
+]
+
+[default]
+terminal = "foot"
+editor = "nvim"
+visual = "nvim"
+browser = "zen"
+
+[cachyos]
+bootstrap_repos = true
+repo_installer_url = "https://mirror.cachyos.org/cachyos-repo.tar.xz"
+repo_target = "v4"
+include_base_repo = true
+kernel = "linux-cachyos-eevdf-lto"
+kernel_headers = "linux-cachyos-eevdf-lto-headers"
+kernel_extra_packages = ["linux-cachyos-eevdf-lto-nvidia-open"]
+install_settings = true
+manage_pacman_conf = false
+
+[paths]
+sops_age_key = "/etc/key.txt"
+
+[ignore]
+pacman = ["yay"]
+foreign = ["yay", "decman", "aconfmgr-git"]
+
+[prune]
+protected = []
+protect_patterns = ["linux*", "nvidia*", "cachyos*"]
+
+[kernel]
+params = [
+  "quiet",
+  "splash",
+  "nosplit_lock_mitigate",
+  "nvidia-drm.modeset=1",
+]
+
+[user]
+shell = "/usr/bin/fish"
+groups = [
+  "wheel",
+  "networkmanager",
+  "input",
+  "audio",
+  "video",
+  "render",
+  "libvirt",
+]
+
+[sudo]
+wheel_policy = "%wheel ALL=(ALL:ALL) ALL"
+
+[zram]
+size = "ram / 4"
+
+[ssh]
+permit_root_login = "no"
+
+[tlp]
+conf = """# Managed by archctl
+
+CPU_SCALING_GOVERNOR_ON_AC=performance
+WIFI_PWR_ON_AC=off
+USB_AUTOSUSPEND=0
+"""
+
+[quickshell]
+screen = "DP-3"
+workspace_count = 15
+panel_height = 60
+content_height = 40
+auto_hide = false
+
+[display]
+primary = "DP-3"
+quickshell_screen = "DP-3"
+
+[[mounts]]
+name = "disk-btrfs"
+what = "UUID=8ee3b9a7-7837-4b76-92ad-f90212db78e9"
+where = "/mnt/disk-btrfs"
+type = "btrfs"
+options = ["rw", "noatime", "compress=zstd:3"]
+automount = true
+timeout_idle_sec = 600
+directory_mode = "755"
+wanted_by = "multi-user.target"
+
+[[mounts]]
+name = "disk-ext4"
+what = "UUID=a7b8065c-ac1c-421a-b8b8-e39546cb7aee"
+where = "/mnt/disk-ext4"
+type = "ext4"
+options = ["rw", "noatime"]
+automount = true
+timeout_idle_sec = 600
+directory_mode = "755"
+wanted_by = "multi-user.target"
+
+[[display.workspaces]]
+monitor = "DP-3"
+ids = [1, 2, 3, 4, 5]
+default = 1
+
+[[display.workspaces]]
+monitor = "HDMI-A-5"
+ids = [6, 7, 8, 9, 10]
+default = 6
+
+[[display.workspaces]]
+monitor = "DP-4"
+ids = [11, 12, 13, 14, 15]
+default = 11

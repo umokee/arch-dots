@@ -1,0 +1,60 @@
+id = "base.network"
+description = "Migrated feature base.network"
+
+[packages]
+pacman = ["networkmanager", "wpa_supplicant", "iwd"]
+aur = []
+
+[[dirs]]
+target = "/etc"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/NetworkManager/conf.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/sysctl.d"
+permissions = "755"
+
+[[files]]
+source = "templates/hostname.j2"
+target = "/etc/hostname"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/networkmanager-dns.j2"
+target = "/etc/NetworkManager/conf.d/dns.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/sysctl-network.j2"
+target = "/etc/sysctl.d/80-network-tuning.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "NetworkManager.service"
+enable = true
+start = true
+
+[[systemd.system]]
+unit = "NetworkManager-dispatcher.service"
+enable = true
+start = true
+
+[[systemd.system]]
+unit = "NetworkManager-wait-online.service"
+enable = true
+start = true

@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+log() {
+  printf '[arch-session-start] %s\n' "$*" >&2
+}
+
+export XDG_SESSION_TYPE="${XDG_SESSION_TYPE:-wayland}"
+export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-Hyprland}"
+export XDG_SESSION_DESKTOP="${XDG_SESSION_DESKTOP:-Hyprland}"
+
+log "importing environment"
+
+dbus-update-activation-environment --systemd \
+  DISPLAY \
+  WAYLAND_DISPLAY \
+  HYPRLAND_INSTANCE_SIGNATURE \
+  XDG_SESSION_TYPE \
+  XDG_CURRENT_DESKTOP \
+  XDG_SESSION_DESKTOP \
+  XDG_DESKTOP_PORTAL_DIR \
+  QT_QPA_PLATFORM \
+  QT_QPA_PLATFORMTHEME \
+  QT_WAYLAND_DISABLE_WINDOWDECORATION \
+  GDK_BACKEND \
+  SDL_VIDEODRIVER \
+  CLUTTER_BACKEND \
+  MOZ_ENABLE_WAYLAND \
+  ELECTRON_OZONE_PLATFORM_HINT \
+  PATH \
+  XDG_CONFIG_HOME \
+  XDG_DATA_HOME \
+  XDG_CACHE_HOME \
+  XDG_STATE_HOME || true
+
+systemctl --user import-environment \
+  DISPLAY \
+  WAYLAND_DISPLAY \
+  HYPRLAND_INSTANCE_SIGNATURE \
+  XDG_SESSION_TYPE \
+  XDG_CURRENT_DESKTOP \
+  XDG_SESSION_DESKTOP \
+  XDG_DESKTOP_PORTAL_DIR \
+  QT_QPA_PLATFORM \
+  QT_QPA_PLATFORMTHEME \
+  QT_WAYLAND_DISABLE_WINDOWDECORATION \
+  GDK_BACKEND \
+  SDL_VIDEODRIVER \
+  CLUTTER_BACKEND \
+  MOZ_ENABLE_WAYLAND \
+  ELECTRON_OZONE_PLATFORM_HINT \
+  PATH \
+  XDG_CONFIG_HOME \
+  XDG_DATA_HOME \
+  XDG_CACHE_HOME \
+  XDG_STATE_HOME || true
+
+log "reloading user units"
+systemctl --user daemon-reload || true
+systemctl --user reset-failed || true
+
+log "starting graphical-session.target"
+systemctl --user start graphical-session.target
+
+# Важно: если target уже был active, новые enabled units могли не подтянуться.
+# Поэтому дополнительно стартуем enabled units из graphical-session.target.wants.
+wants_dir="$HOME/.config/systemd/user/graphical-session.target.wants"
+
+if [[ -d "$wants_dir" ]]; then
+  while IFS= read -r -d '' unit_path; do
+    unit="$(basename "$unit_path")"
+
+    case "$unit" in
+      *.service|*.socket|*.timer)
+        log "starting wanted unit: $unit"
+        systemctl --user start "$unit" || true
+        ;;
+    esac
+  done < <(find "$wants_dir" -mindepth 1 -maxdepth 1 -print0 2>/dev/null)
+fi
+
+log "done"

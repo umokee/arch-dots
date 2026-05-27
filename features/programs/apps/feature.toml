@@ -1,0 +1,30 @@
+id = "programs.apps"
+description = "Migrated feature programs.apps"
+
+[packages]
+pacman = [
+  "obsidian",
+  "chromium",
+  "telegram-desktop",
+  "libreoffice-fresh",
+  "xorg-xlsclients",
+  "transmission-gtk",
+  "wev",
+  "obs-studio",
+  "webkit2gtk-4.1",
+  "pavucontrol",
+  "easyeffects",
+  "simple-scan",
+  "sane",
+  "virt-manager",
+  "network-manager-applet",
+]
+aur = [
+  "claude-code",
+  "winboat-bin",
+  "spotify",
+  "czkawka-gui",
+  "mullvad-browser-bin",
+  "pgadmin4-bin",
+  "openai-codex-bin",
+]

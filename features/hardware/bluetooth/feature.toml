@@ -1,0 +1,11 @@
+id = "hardware.bluetooth"
+description = "Migrated feature hardware.bluetooth"
+
+[packages]
+pacman = ["bluez", "bluez-utils", "blueman"]
+aur = []
+
+[[systemd.system]]
+unit = "bluetooth.service"
+enable = true
+start = true

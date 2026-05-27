@@ -1,0 +1,18 @@
+id = "hardware.print"
+description = "Migrated feature hardware.print"
+
+[packages]
+pacman = [
+  "cups",
+  "gutenprint",
+  "system-config-printer",
+  "sane",
+  "sane-airscan",
+  "simple-scan",
+]
+aur = []
+
+[[systemd.system]]
+unit = "cups.socket"
+enable = true
+start = true

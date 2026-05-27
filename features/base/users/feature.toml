@@ -1,0 +1,24 @@
+id = "base.users"
+description = "Migrated feature base.users"
+
+[packages]
+pacman = ["shadow", "fish"]
+aur = []
+
+[[dirs]]
+target = "/etc/systemd/system"
+permissions = "755"
+
+[[files]]
+source = "templates/create-main-user-service.j2"
+target = "/etc/systemd/system/create-main-user.service"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "create-main-user.service"
+enable = true
+start = true

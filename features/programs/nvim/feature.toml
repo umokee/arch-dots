@@ -1,0 +1,16 @@
+id = "programs.nvim"
+description = "Migrated feature programs.nvim"
+
+[packages]
+pacman = ["neovim", "tree-sitter"]
+aur = []
+
+[[dirs]]
+target = "~/.config"
+permissions = "755"
+
+[[files]]
+source = "files/home/.config/nvim"
+target = "~/.config/nvim"
+mode = "link"
+type = "dir"

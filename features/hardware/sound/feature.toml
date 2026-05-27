@@ -1,0 +1,45 @@
+id = "hardware.sound"
+description = "Migrated feature hardware.sound"
+
+[packages]
+pacman = [
+  "pipewire",
+  "pipewire-pulse",
+  "pipewire-alsa",
+  "pipewire-jack",
+  "wireplumber",
+  "rtkit",
+  "alsa-utils",
+]
+aur = []
+
+[[dirs]]
+target = "/etc/modprobe.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/security/limits.d"
+permissions = "755"
+
+[[files]]
+source = "templates/usb-audio-modprobe.j2"
+target = "/etc/modprobe.d/usb-audio.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/limits-audio.j2"
+target = "/etc/security/limits.d/95-audio.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "rtkit-daemon.service"
+enable = true
+start = true

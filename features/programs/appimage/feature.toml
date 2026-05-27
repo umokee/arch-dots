@@ -1,0 +1,6 @@
+id = "programs.appimage"
+description = "Migrated feature programs.appimage"
+
+[packages]
+pacman = ["fuse2", "desktop-file-utils", "shared-mime-info"]
+aur = []

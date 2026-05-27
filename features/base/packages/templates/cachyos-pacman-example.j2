@@ -1,0 +1,32 @@
+[options]
+HoldPkg     = pacman glibc
+Architecture = auto
+CheckSpace
+ParallelDownloads = 10
+Color
+ILoveCandy
+VerbosePkgLists
+SigLevel    = Required DatabaseOptional
+LocalFileSigLevel = Optional
+
+# CachyOS repos above Arch repos.
+[cachyos-v4]
+Include = /etc/pacman.d/cachyos-v4-mirrorlist
+
+[cachyos-core-v4]
+Include = /etc/pacman.d/cachyos-v4-mirrorlist
+
+[cachyos-extra-v4]
+Include = /etc/pacman.d/cachyos-v4-mirrorlist
+
+[cachyos]
+Include = /etc/pacman.d/cachyos-mirrorlist
+
+[core]
+Include = /etc/pacman.d/mirrorlist
+
+[extra]
+Include = /etc/pacman.d/mirrorlist
+
+[multilib]
+Include = /etc/pacman.d/mirrorlist

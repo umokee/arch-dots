@@ -1,0 +1,24 @@
+id = "programs.gaming"
+description = "Migrated feature programs.gaming"
+
+[packages]
+pacman = [
+  "cachyos-gaming-meta",
+  "cachyos-gaming-applications",
+  "gamescope",
+  "gamemode",
+  "lib32-gamemode",
+  "mangohud",
+  "lib32-mangohud",
+  "protonup-qt",
+  "lutris",
+  "openrgb",
+  "opentabletdriver",
+  "ananicy-cpp",
+]
+aur = []
+
+[[systemd.system]]
+unit = "ananicy-cpp.service"
+enable = true
+start = true

@@ -1,0 +1,12 @@
+[Unit]
+Description=sing-box service wrapper
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/sing-box run -c /etc/sing-box/config.json
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

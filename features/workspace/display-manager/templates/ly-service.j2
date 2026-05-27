@@ -1,0 +1,17 @@
+[Unit]
+Description=Ly display manager
+Documentation=man:ly(1)
+After=systemd-user-sessions.service getty@tty2.service plymouth-quit-wait.service
+After=rc-local.service
+Conflicts=getty@tty2.service
+Conflicts=display-manager.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ly
+Restart=always
+RestartSec=1
+
+[Install]
+Alias=display-manager.service
+WantedBy=graphical.target

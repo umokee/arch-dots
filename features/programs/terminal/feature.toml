@@ -1,0 +1,16 @@
+id = "programs.terminal"
+description = "Migrated feature programs.terminal"
+
+[packages]
+pacman = ["foot"]
+aur = []
+
+[[dirs]]
+target = "~/.config"
+permissions = "755"
+
+[[files]]
+source = "files/home/.config/foot"
+target = "~/.config/foot"
+mode = "link"
+type = "dir"

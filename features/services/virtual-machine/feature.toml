@@ -1,0 +1,35 @@
+id = "services.virtual-machine"
+description = "Migrated feature services.virtual-machine"
+
+[packages]
+pacman = [
+  "qemu-full",
+  "virt-manager",
+  "virt-viewer",
+  "dnsmasq",
+  "vde2",
+  "openbsd-netcat",
+  "libguestfs",
+  "edk2-ovmf",
+  "iproute2",
+  "iptables",
+]
+aur = []
+
+[[dirs]]
+target = "/etc/libvirt/qemu.conf.d"
+permissions = "755"
+
+[[files]]
+source = "templates/libvirt-qemu-conf.j2"
+target = "/etc/libvirt/qemu.conf.d/10-arch-toml.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "libvirtd.service"
+enable = true
+start = true

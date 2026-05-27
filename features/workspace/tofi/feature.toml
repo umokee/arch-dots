@@ -1,0 +1,27 @@
+id = "workspace.tofi"
+description = "Migrated feature workspace.tofi"
+
+[packages]
+pacman = []
+aur = ["tofi"]
+
+[[dirs]]
+target = "~/.local/bin"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config"
+permissions = "755"
+
+[[files]]
+source = "templates/tofi-clear-cache.j2"
+target = "~/.local/bin/tofi-clear-cache"
+mode = "template"
+type = "file"
+permissions = "755"
+
+[[files]]
+source = "files/home/.config/tofi"
+target = "~/.config/tofi"
+mode = "link"
+type = "dir"

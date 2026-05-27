@@ -1,0 +1,43 @@
+id = "hardware.power"
+description = "Migrated feature hardware.power"
+
+[packages]
+pacman = [
+  "tlp",
+  "tlp-rdw",
+  "ethtool",
+  "powertop",
+]
+aur = []
+
+[[dirs]]
+target = "/etc/tlp.conf.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/sysctl.d"
+permissions = "755"
+
+[[files]]
+source = "templates/tlp-conf.j2"
+target = "/etc/tlp.conf.d/90-arch-toml.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/sysctl-power.j2"
+target = "/etc/sysctl.d/70-power.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "tlp.service"
+enable = true
+start = true
+condition_machine_type = "laptop"

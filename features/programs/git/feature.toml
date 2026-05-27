@@ -1,0 +1,24 @@
+id = "programs.git"
+description = "Migrated feature programs.git"
+
+[packages]
+pacman = ["git", "github-cli", "diff-so-fancy"]
+aur = []
+
+[[dirs]]
+target = "~/.config/git"
+permissions = "755"
+
+
+[[files]]
+source = "templates/gitignore-global.j2"
+target = "~/.config/git/ignore"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "files/home/.gitconfig"
+target = "~/.gitconfig"
+mode = "link"
+type = "file"

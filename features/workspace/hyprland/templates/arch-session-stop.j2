@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+log() {
+  printf '[arch-session-stop] %s\n' "$*" >&2
+}
+
+log "stopping graphical-session.target"
+systemctl --user stop graphical-session.target || true
+systemctl --user reset-failed || true
+
+log "done"

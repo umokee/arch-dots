@@ -1,0 +1,37 @@
+id = "workspace.display-manager"
+description = "Migrated feature workspace.display-manager"
+
+[packages]
+pacman = ["ly"]
+aur = []
+
+[[dirs]]
+target = "/etc/ly"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/systemd/system"
+permissions = "755"
+
+[[files]]
+source = "templates/ly-config.j2"
+target = "/etc/ly/config.ini"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/ly-service.j2"
+target = "/etc/systemd/system/ly.service"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "ly.service"
+enable = true
+start = true

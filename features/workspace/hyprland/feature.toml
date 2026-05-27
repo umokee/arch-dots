@@ -1,0 +1,113 @@
+id = "workspace.hyprland"
+description = "Migrated feature workspace.hyprland"
+
+[packages]
+pacman = [
+  "hyprland",
+  "uwsm",
+  "xorg-xwayland",
+  "xdg-desktop-portal",
+  "xdg-desktop-portal-hyprland",
+  "xdg-desktop-portal-gtk",
+  "polkit-kde-agent",
+  "cliphist",
+  "grim",
+  "slurp",
+  "jq",
+  "wl-clipboard",
+  "swappy",
+  "brightnessctl",
+  "playerctl",
+  "pamixer",
+  "network-manager-applet",
+  "wofi",
+  "nemo",
+  "xarchiver",
+  "kitty",
+]
+aur = []
+
+[[dirs]]
+target = "/etc/environment.d"
+permissions = "755"
+
+[[dirs]]
+target = "~/.local/bin"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config"
+permissions = "755"
+
+[[dirs]]
+target = "/usr/local/bin"
+permissions = "755"
+
+[[dirs]]
+target = "/usr/share/wayland-sessions"
+permissions = "755"
+
+[[files]]
+source = "templates/wayland-environment.j2"
+target = "/etc/environment.d/40-wayland-desktop.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/screenshot-tool.j2"
+target = "~/.local/bin/screenshot-tool"
+mode = "template"
+type = "file"
+permissions = "755"
+
+[[files]]
+source = "templates/collect.j2"
+target = "~/.local/bin/collect"
+mode = "template"
+type = "file"
+permissions = "755"
+
+[[files]]
+source = "files/home/.config/hypr"
+target = "~/.config/hypr"
+mode = "link"
+type = "dir"
+
+[[files]]
+source = "templates/arch-session-start.j2"
+target = "/usr/local/bin/arch-session-start"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "755"
+
+[[files]]
+source = "templates/arch-session-stop.j2"
+target = "/usr/local/bin/arch-session-stop"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "755"
+
+[[files]]
+source = "templates/arch-hyprland-session.j2"
+target = "/usr/local/bin/arch-hyprland-session"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "755"
+
+[[files]]
+source = "templates/arch-hyprland.desktop.j2"
+target = "/usr/share/wayland-sessions/arch-hyprland.desktop"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"

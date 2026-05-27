@@ -1,0 +1,24 @@
+id = "services.fail2ban"
+description = "Migrated feature services.fail2ban"
+
+[packages]
+pacman = ["fail2ban"]
+aur = []
+
+[[dirs]]
+target = "/etc/fail2ban/jail.d"
+permissions = "755"
+
+[[files]]
+source = "templates/fail2ban-sshd.j2"
+target = "/etc/fail2ban/jail.d/sshd.local"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "fail2ban.service"
+enable = true
+start = true

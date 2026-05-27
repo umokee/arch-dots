@@ -1,0 +1,435 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "dns": {
+    "servers": [
+      "localhost",
+      {
+        "address": "https://1.1.1.1/dns-query",
+        "queryStrategy": "UseIPv4",
+        "skipFallback": false
+      },
+      {
+        "address": "8.8.8.8",
+        "queryStrategy": "UseIPv4",
+        "skipFallback": false
+      }
+    ],
+    "queryStrategy": "UseIPv4",
+    "disableCache": false,
+    "disableFallback": false,
+    "disableFallbackIfMatch": false,
+    "enableParallelQuery": false
+  },
+  "inbounds": [
+    {
+      "tag": "socks-in",
+      "listen": "127.0.0.1",
+      "port": 2080,
+      "protocol": "socks",
+      "settings": {
+        "udp": true
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"],
+        "routeOnly": true
+      }
+    },
+    {
+      "tag": "http-in",
+      "listen": "127.0.0.1",
+      "port": 2081,
+      "protocol": "http",
+      "settings": {},
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"],
+        "routeOnly": true
+      }
+    },
+    {
+      "tag": "http-in-only-proxy",
+      "listen": "127.0.0.1",
+      "port": 2090,
+      "protocol": "http",
+      "settings": {},
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"],
+        "routeOnly": true
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "reality-eu1-yandex",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "5.181.202.37",
+            "port": 443,
+            "users": [
+              {
+                "id": "eb474188-1ec6-4019-a5a4-a48b50fb450d",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "chrome",
+          "serverName": "yandex.ru",
+          "publicKey": "UzqX2jUnEtpuCapQq28G1kad8VORWG2wFCjyyVydUlU",
+          "shortId": "a661f6c232360a31",
+          "spiderX": "/"
+        },
+        "sockopt": {
+          "tcpKeepAliveIdle": 300,
+          "tcpKeepAliveInterval": 30,
+          "tcpNoDelay": true,
+          "tcpCongestion": "bbr"
+        }
+      }
+    },
+    {
+      "tag": "reality-eu1-yastatic",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "5.181.202.37",
+            "port": 444,
+            "users": [
+              {
+                "id": "eb474188-1ec6-4019-a5a4-a48b50fb450d",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "chrome",
+          "serverName": "yastatic.net",
+          "publicKey": "UzqX2jUnEtpuCapQq28G1kad8VORWG2wFCjyyVydUlU",
+          "shortId": "b661f6c232360a31",
+          "spiderX": "/"
+        },
+        "sockopt": {
+          "tcpKeepAliveIdle": 300,
+          "tcpKeepAliveInterval": 30,
+          "tcpNoDelay": true,
+          "tcpCongestion": "bbr"
+        }
+      }
+    },
+    {
+      "tag": "reality-eu1-2gis",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "5.181.202.37",
+            "port": 445,
+            "users": [
+              {
+                "id": "eb474188-1ec6-4019-a5a4-a48b50fb450d",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "chrome",
+          "serverName": "2gis.com",
+          "publicKey": "UzqX2jUnEtpuCapQq28G1kad8VORWG2wFCjyyVydUlU",
+          "shortId": "c661f6c232360a31",
+          "spiderX": "/"
+        },
+        "sockopt": {
+          "tcpKeepAliveIdle": 300,
+          "tcpKeepAliveInterval": 30,
+          "tcpNoDelay": true,
+          "tcpCongestion": "bbr"
+        }
+      }
+    },
+    {
+      "tag": "reality-eu1-auto",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "5.181.202.37",
+            "port": 446,
+            "users": [
+              {
+                "id": "eb474188-1ec6-4019-a5a4-a48b50fb450d",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "chrome",
+          "serverName": "auto.ru",
+          "publicKey": "UzqX2jUnEtpuCapQq28G1kad8VORWG2wFCjyyVydUlU",
+          "shortId": "d661f6c232360a31",
+          "spiderX": "/"
+        },
+        "sockopt": {
+          "tcpKeepAliveIdle": 300,
+          "tcpKeepAliveInterval": 30,
+          "tcpNoDelay": true,
+          "tcpCongestion": "bbr"
+        }
+      }
+    },
+    {
+      "tag": "reality-eu1-max",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "5.181.202.37",
+            "port": 447,
+            "users": [
+              {
+                "id": "eb474188-1ec6-4019-a5a4-a48b50fb450d",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "chrome",
+          "serverName": "max.ru",
+          "publicKey": "UzqX2jUnEtpuCapQq28G1kad8VORWG2wFCjyyVydUlU",
+          "shortId": "e661f6c232360a31",
+          "spiderX": "/"
+        },
+        "sockopt": {
+          "tcpKeepAliveIdle": 300,
+          "tcpKeepAliveInterval": 30,
+          "tcpNoDelay": true,
+          "tcpCongestion": "bbr"
+        }
+      }
+    },
+    {
+      "tag": "xhttp-eu1",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "umkcloud.xyz",
+            "port": 8443,
+            "users": [
+              {
+                "id": "eb474188-1ec6-4019-a5a4-a48b50fb450d",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "umkcloud.xyz",
+          "alpn": ["h2"],
+          "fingerprint": "chrome"
+        },
+        "xhttpSettings": {
+          "mode": "stream-one",
+          "path": "/xhttp/"
+        }
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "AsIs"
+      }
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
+    }
+  ],
+  "burstObservatory": {
+    "subjectSelector": ["reality-"],
+    "pingConfig": {
+      "destination": "https://connectivitycheck.gstatic.com/generate_204",
+      "interval": "2m",
+      "sampling": 4,
+      "timeout": "4s",
+      "httpMethod": "HEAD"
+    }
+  },
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "domainMatcher": "mph",
+    "balancers": [
+      {
+        "tag": "reality-auto",
+        "selector": ["reality-"],
+        "fallbackTag": "xhttp-eu1",
+        "strategy": {
+          "type": "leastPing"
+        }
+      }
+    ],
+    "rules": [
+      {
+        "type": "field",
+        "inboundTag": ["http-in-only-proxy"],
+        "balancerTag": "reality-auto"
+      },
+      {
+        "type": "field",
+        "ip": ["geoip:private"],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ip": ["224.0.0.0/3", "ff00::/8"],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "protocol": ["bittorrent"],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "domain:nixos.org",
+          "domain:cachix.org",
+          "domain:cache.nixos.org",
+          "domain:nix-community.cachix.org",
+          "domain:freeconferencecall.com",
+          "domain:w.tv",
+          "domain:streams-search-service.w.tv",
+          "domain:streams.w.tv",
+          "domain:habr.com",
+          "domain:antiplagiat.ru",
+          "domain:vk.ru"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "domain:sheets.google.com",
+          "domain:docs.google.com",
+          "domain:drive.google.com",
+          "domain:accounts.google.com",
+          "domain:apis.google.com",
+          "domain:googleapis.com",
+          "domain:googleusercontent.com",
+          "domain:gstatic.com",
+          "domain:vercel.com",
+          "domain:v0.app",
+          "domain:gnusenpai.net",
+          "domain:typingstudy.com",
+          "domain:typingclub.com",
+          "domain:typing.com",
+          "domain:penpot.app",
+          "domain:diagrams.net",
+          "domain:draw.io",
+          "domain:creately.com",
+          "domain:yworks.com",
+          "domain:whimsical.com",
+          "domain:linear.app",
+          "domain:castlots.org",
+          "domain:yopmail.com",
+          "domain:monkeytype.com",
+          "domain:sqlalchemy.org",
+          "domain:poecdn.com",
+          "domain:doppiocdn.live",
+          "domain:deepwiki.com",
+          "domain:oauth2.googleapis.com",
+          "domain:gemini.google.com",
+          "domain:developers.google.com",
+          "domain:www.googleapis.com",
+          "domain:vsassets.io",
+          "domain:gallery.vsassets.io",
+          "domain:marketplace.visualstudio.com",
+          "domain:roboflow.com",
+          "domain:copyleaks.com",
+          "domain:zerogpt.com",
+          "domain:chatgpt.com",
+          "domain:stripchat.com"
+        ],
+        "balancerTag": "reality-auto"
+      },
+      {
+        "type": "field",
+        "domain": ["geosite:ru-blocked", "geosite:refilter"],
+        "balancerTag": "reality-auto"
+      },
+      {
+        "type": "field",
+        "ip": ["geoip:ru-blocked", "geoip:re-filter"],
+        "balancerTag": "reality-auto"
+      },
+      {
+        "type": "field",
+        "network": "tcp,udp",
+        "outboundTag": "direct"
+      }
+    ]
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "handshake": 4,
+        "connIdle": 300,
+        "uplinkOnly": 1,
+        "downlinkOnly": 1,
+        "bufferSize": 4
+      }
+    },
+    "system": {
+      "statsInboundUplink": false,
+      "statsInboundDownlink": false,
+      "statsOutboundUplink": false,
+      "statsOutboundDownlink": false
+    }
+  }
+}

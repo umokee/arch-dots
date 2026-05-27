@@ -1,0 +1,28 @@
+id = "hardware.amd"
+description = "Migrated feature hardware.amd"
+
+[packages]
+pacman = [
+  "amd-ucode",
+  "vulkan-radeon",
+  "libva-mesa-driver",
+  "mesa-vdpau",
+  "vdpauinfo",
+  "clinfo",
+  "ryzenadj",
+  "zenmonitor",
+]
+aur = []
+
+[[dirs]]
+target = "/etc/environment.d"
+permissions = "755"
+
+[[files]]
+source = "templates/amd-env.j2"
+target = "/etc/environment.d/30-amd-graphics.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"

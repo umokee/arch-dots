@@ -1,0 +1,11 @@
+id = "services.fstrim"
+description = "Migrated feature services.fstrim"
+
+[packages]
+pacman = ["util-linux"]
+aur = []
+
+[[systemd.system]]
+unit = "fstrim.timer"
+enable = true
+start = true

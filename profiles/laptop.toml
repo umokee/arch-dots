@@ -1,0 +1,127 @@
+hostname = "archlinux"
+username = "user"
+machine_type = "laptop"
+color_scheme = "dark"
+wallpaper_name = "backyard"
+fallback_kernel = true
+features = [
+  "base.boot",
+  "base.system",
+  "base.security",
+  "base.locale",
+  "base.network",
+  "base.users",
+  "base.fonts",
+  "base.packages",
+  "base.secrets",
+  "base.cleanup",
+  "hardware.graphics",
+  "hardware.keyboard-mouse",
+  "hardware.amd",
+  "hardware.power",
+  "hardware.sound",
+  "workspace.hyprland",
+  "workspace.kanshi",
+  "workspace.display-manager",
+  "workspace.tofi",
+  "workspace.wallpapers",
+  "workspace.themes",
+  "workspace.xdg",
+  "programs.git",
+  "programs.ssh",
+  "programs.nvim",
+  "programs.browsers",
+  "programs.terminal",
+  "programs.shell",
+  "programs.dev",
+  "services.sing-box",
+  "services.openssh",
+  "services.brightnessctl",
+  "services.fstrim",
+  "services.gammastep",
+]
+
+[default]
+terminal = "foot"
+editor = "nvim"
+visual = "nvim"
+browser = "zen"
+
+[cachyos]
+bootstrap_repos = true
+repo_installer_url = "https://mirror.cachyos.org/cachyos-repo.tar.xz"
+repo_target = "v4"
+include_base_repo = true
+kernel = "linux-cachyos-eevdf-lto"
+kernel_headers = "linux-cachyos-eevdf-lto-headers"
+kernel_extra_packages = ["linux-cachyos-eevdf-lto-nvidia-open"]
+install_settings = true
+manage_pacman_conf = false
+
+[paths]
+sops_age_key = "/etc/key.txt"
+
+[ignore]
+pacman = ["yay"]
+foreign = ["yay", "decman", "aconfmgr-git"]
+
+[prune]
+protected = []
+protect_patterns = ["linux*", "nvidia*", "cachyos*"]
+
+[kernel]
+params = [
+  "quiet",
+  "splash",
+  "nosplit_lock_mitigate",
+  "amd_pstate=active",
+  "clearcpuid=514",
+]
+
+[user]
+shell = "/usr/bin/fish"
+groups = [
+  "wheel",
+  "networkmanager",
+  "input",
+  "audio",
+  "video",
+  "render",
+]
+
+[sudo]
+wheel_policy = "%wheel ALL=(ALL:ALL) ALL"
+
+[zram]
+size = "ram / 4"
+
+[ssh]
+permit_root_login = "no"
+
+[tlp]
+conf = """# Managed by archctl
+
+CPU_SCALING_GOVERNOR_ON_AC=performance
+CPU_SCALING_GOVERNOR_ON_BAT=schedutil
+CPU_ENERGY_PERF_POLICY_ON_AC=performance
+CPU_ENERGY_PERF_POLICY_ON_BAT=balance_power
+WIFI_PWR_ON_AC=off
+WIFI_PWR_ON_BAT=on
+USB_AUTOSUSPEND=1
+"""
+
+[quickshell]
+screen = "eDP-1"
+workspace_count = 10
+panel_height = 60
+content_height = 40
+auto_hide = false
+
+[display]
+primary = "eDP-1"
+quickshell_screen = "eDP-1"
+
+[[display.workspaces]]
+monitor = "eDP-1"
+ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+default = 1

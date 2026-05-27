@@ -1,0 +1,16 @@
+id = "workspace.dunst"
+description = "Migrated feature workspace.dunst"
+
+[packages]
+pacman = ["dunst", "libnotify"]
+aur = []
+
+[[dirs]]
+target = "~/.config"
+permissions = "755"
+
+[[files]]
+source = "files/home/.config/dunst"
+target = "~/.config/dunst"
+mode = "link"
+type = "dir"

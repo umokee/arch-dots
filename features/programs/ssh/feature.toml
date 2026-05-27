@@ -1,0 +1,16 @@
+id = "programs.ssh"
+description = "Migrated feature programs.ssh"
+
+[packages]
+pacman = ["openssh"]
+aur = []
+
+[[dirs]]
+target = "~/.ssh"
+permissions = "755"
+
+[[files]]
+source = "files/home/.ssh/config"
+target = "~/.ssh/config"
+mode = "link"
+type = "file"

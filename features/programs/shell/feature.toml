@@ -1,0 +1,39 @@
+id = "programs.shell"
+description = "Migrated feature programs.shell"
+
+[packages]
+pacman = [
+  "fish",
+  "fzf",
+  "zoxide",
+  "direnv",
+  "tmux",
+  "starship",
+]
+aur = []
+
+[[dirs]]
+target = "~/.config"
+permissions = "755"
+
+[[files]]
+source = "files/home/.config/fish"
+target = "~/.config/fish"
+mode = "link"
+type = "dir"
+
+[[files]]
+source = "files/home/.config/tmux"
+target = "~/.config/tmux"
+mode = "link"
+type = "dir"
+
+[[files]]
+source = "files/home/.config/starship.toml"
+target = "~/.config/starship.toml"
+mode = "link"
+type = "file"
+
+[[links]]
+source = "~/.config/tmux/tmux.conf"
+target = "~/.tmux.conf"

@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DIR="$HOME/Pictures/Screenshots"
+mkdir -p "$DIR"
+
+get_next_number() {
+  local i=1
+  while [[ -e "$DIR/screenshot-$i.png" ]]; do
+    ((i++))
+  done
+  echo "$i"
+}
+
+NUM="$(get_next_number)"
+FILE="$DIR/screenshot-$NUM.png"
+
+case "${1:-area}" in
+  window)
+    hyprctl -j activewindow |
+      jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' |
+      grim -g - "$FILE"
+    wl-copy < "$FILE"
+    echo "$FILE"
+    ;;
+
+  area)
+    grim -g "$(slurp)" "$FILE"
+    wl-copy < "$FILE"
+    echo "$FILE"
+    ;;
+
+  full)
+    grim "$FILE"
+    wl-copy < "$FILE"
+    echo "$FILE"
+    ;;
+
+  clip)
+    grim -g "$(slurp)" - | wl-copy -t image/png
+    echo "copied"
+    ;;
+
+  *)
+    echo "Usage: screenshot-tool {window|area|full|clip}" >&2
+    exit 2
+    ;;
+esac

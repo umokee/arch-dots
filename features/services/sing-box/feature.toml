@@ -1,0 +1,37 @@
+id = "services.sing-box"
+description = "Migrated feature services.sing-box"
+
+[packages]
+pacman = ["sing-box"]
+aur = []
+
+[[dirs]]
+target = "/etc/sing-box"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/systemd/system"
+permissions = "755"
+
+[[files]]
+source = "templates/sing-box-config.j2"
+target = "/etc/sing-box/config.json"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "600"
+
+[[files]]
+source = "templates/sing-box-wrapper-service.j2"
+target = "/etc/systemd/system/singbox-wrapper.service"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "singbox-wrapper.service"
+enable = true
+start = true

@@ -1,0 +1,11 @@
+id = "hardware.graphics"
+description = "Migrated feature hardware.graphics"
+
+[packages]
+pacman = [
+  "mesa",
+  "libglvnd",
+  "vulkan-validation-layers",
+  "libva-utils",
+]
+aur = []

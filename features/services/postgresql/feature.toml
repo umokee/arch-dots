@@ -1,0 +1,69 @@
+id = "services.postgresql"
+description = "Migrated feature services.postgresql"
+
+[packages]
+pacman = ["postgresql", "postgresql-libs"]
+aur = []
+
+[[dirs]]
+target = "/etc/tmpfiles.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/postgresql"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/systemd/system"
+permissions = "755"
+
+[[files]]
+source = "templates/postgresql-tmpfiles.j2"
+target = "/etc/tmpfiles.d/postgresql-local.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/postgresql-local-conf.j2"
+target = "/etc/postgresql/local.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/postgresql-first-init-service.j2"
+target = "/etc/systemd/system/postgresql-first-init.service"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/postgresql-apply-config-service.j2"
+target = "/etc/systemd/system/postgresql-apply-config.service"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "postgresql-first-init.service"
+enable = true
+start = true
+
+[[systemd.system]]
+unit = "postgresql-apply-config.service"
+enable = true
+start = true
+
+[[systemd.system]]
+unit = "postgresql.service"
+enable = true
+start = true

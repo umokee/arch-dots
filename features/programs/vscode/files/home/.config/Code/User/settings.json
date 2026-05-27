@@ -1,0 +1,498 @@
+{
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', monospace",
+  "editor.fontSize": 18,
+  "window.zoomLevel": 1,
+
+  "workbench.iconTheme": "bearded-icons",
+  "workbench.colorTheme": "Dark Lavender",
+
+  "http.proxy": "http://127.0.0.1:2090",
+  "http.proxyStrictSSL": false,
+
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+
+  "problems.showCurrentInStatus": true,
+  "problems.sortOrder": "severity",
+
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.lineNumbers": "relative",
+  "editor.renderLineHighlight": "all",
+  "editor.cursorSurroundingLines": 10,
+  "editor.wordWrap": "off",
+  "editor.cursorStyle": "block",
+  "editor.cursorBlinking": "solid",
+  "editor.glyphMargin": true,
+  "files.insertFinalNewline": true,
+  "workbench.tree.indent": 14,
+
+  "editor.scrollbar.vertical": "hidden",
+  "editor.scrollbar.horizontal": "hidden",
+  "editor.minimap.enabled": true,
+  "editor.minimap.renderCharacters": false,
+
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.matchBrackets": "never",
+  "editor.occurrencesHighlight": "off",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.guides.indentation": true,
+  "editor.guides.highlightActiveIndentation": true,
+
+  "editor.lightbulb.enabled": "off",
+  "editor.showFoldingControls": "never",
+  "breadcrumbs.enabled": false,
+  "workbench.tips.enabled": false,
+  "editor.overviewRulerBorder": false,
+  "editor.hideCursorInOverviewRuler": true,
+  "editor.stickyScroll.enabled": false,
+  "workbench.tree.enableStickyScroll": false,
+
+  "workbench.sideBar.location": "left",
+  "workbench.statusBar.visible": true,
+  "workbench.activityBar.location": "default",
+  "workbench.editor.showTabs": "multiple",
+  "workbench.editor.tabSizing": "shrink",
+  "workbench.editor.wrapTabs": true,
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.value": 10,
+  "workbench.startupEditor": "none",
+  "chat.commandCenter.enabled": false,
+  "workbench.layoutControl.enabled": false,
+  "window.customTitleBarVisibility": "never",
+  "window.titleBarStyle": "native",
+  "window.menuBarVisibility": "toggle",
+
+  "explorer.confirmDragAndDrop": true,
+  "explorer.confirmDelete": true,
+  "explorer.decorations.badges": false,
+  "workbench.tree.renderIndentGuides": "none",
+
+  "git.decorations.enabled": false,
+  "scm.diffDecorations": "none",
+
+  "files.autoSave": "afterDelay",
+  "update.mode": "none",
+  "extensions.autoUpdate": false,
+  "extensions.autoCheckUpdates": false,
+  "window.restoreWindows": "none",
+  "workbench.editor.restoreViewState": false,
+  "files.hotExit": "off",
+
+  "search.useIgnoreFiles": true,
+  "search.useGlobalIgnoreFiles": true,
+  "search.useParentIgnoreFiles": true,
+
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/node_modules/**": true,
+    "**/.venv": true,
+    "**/.venv/**": true,
+    "**/venv": true,
+    "**/venv/**": true,
+    "**/__pycache__": true,
+    "**/__pycache__/**": true,
+    "**/.pytest_cache": true,
+    "**/.pytest_cache/**": true,
+    "**/.mypy_cache": true,
+    "**/.mypy_cache/**": true,
+    "**/.ruff_cache": true,
+    "**/.ruff_cache/**": true,
+    "**/dist": true,
+    "**/dist/**": true,
+    "**/build": true,
+    "**/build/**": true,
+    "**/.next": true,
+    "**/.next/**": true,
+    "**/.turbo": true,
+    "**/.turbo/**": true,
+    "**/.cache": true,
+    "**/.cache/**": true,
+    "**/coverage": true,
+    "**/coverage/**": true,
+    "**/package-lock.json": true,
+    "**/pnpm-lock.yaml": true,
+    "**/yarn.lock": true,
+    "**/bun.lockb": true,
+    "**/uv.lock": true,
+    "**/poetry.lock": true,
+    "**/*.pyc": true,
+    "**/*.pyo": true,
+    "**/*.pyd": true,
+    "**/*.log": true,
+    "**/*.map": true
+  },
+
+  "[lua]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "JohnnyMorganz.stylua",
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit"
+    }
+  },
+  "Lua.runtime.version": "LuaJIT",
+  "Lua.diagnostics.globals": ["vim", "describe", "it", "before_each", "after_each"],
+  "Lua.workspace.checkThirdParty": false,
+  "Lua.hint.enable": true,
+  "Lua.hint.setType": true,
+  "Lua.hint.paramType": true,
+  "Lua.hint.paramName": "All",
+  "Lua.hint.arrayIndex": "Disable",
+  "Lua.completion.callSnippet": "Replace",
+  "Lua.telemetry.enable": false,
+
+  "[nix]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "jnoortheen.nix-ide",
+    "editor.formatOnSave": true
+  },
+  "nix.enableLanguageServer": true,
+  "nix.serverPath": "nil",
+  "nix.serverSettings.nil.formatting.command": ["nixfmt"],
+  "nix.serverSettings.nil.diagnostics.ignored": ["unused_binding", "unused_with"],
+
+  "[python]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+  "python.languageServer": "Pylance",
+  "python.analysis.userFileIndexingLimit": -1,
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.useLibraryCodeForTypes": true,
+  "python.analysis.typeCheckingMode": "off",
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportCallInDefaultInitializer": "none"
+  },
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.indexing": true,
+  "python.analysis.extraPaths": ["src"],
+  "python.analysis.packageIndexDepths": [
+    {
+      "name": "",
+      "depth": 5,
+      "includeAllSymbols": true
+    }
+  ],
+
+  "[typescript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit",
+      "source.removeUnusedImports": "explicit"
+    }
+  },
+  "[javascript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[typescriptreact]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit",
+      "source.removeUnusedImports": "explicit"
+    }
+  },
+  "[javascriptreact]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
+  },
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.importModuleSpecifier": "shortest",
+  "typescript.suggest.completeFunctionCalls": true,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "javascript.suggest.completeFunctionCalls": true,
+
+  "[vue]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "Vue.volar",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
+  },
+  "vue.inlayHints.inlineHandlerLeading": true,
+  "vue.inlayHints.missingProps": true,
+  "vue.inlayHints.optionsWrapper": false,
+
+  "[shellscript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "mads-hartmann.bash-ide-vscode",
+    "editor.formatOnSave": true
+  },
+  "bashIde.shfmt.spaceRedirects": true,
+  "bashIde.shfmt.simplifyCode": true,
+
+  "[yaml]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.formatOnSave": true
+  },
+  "yaml.validate": true,
+  "yaml.hover": true,
+  "yaml.completion": true,
+  "yaml.format.enable": true,
+  "yaml.format.printWidth": 100,
+
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+
+  "[html]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[css]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[scss]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+
+  "[markdown]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "other": "off",
+      "comments": "off",
+      "strings": "off"
+    }
+  },
+
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker",
+    "editor.formatOnSave": true
+  },
+
+  "[qml]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "theqtcompany.qt-qml",
+    "editor.formatOnSave": true
+  },
+
+  "auto-close-tag.enableAutoCloseSelfClosingTag": true,
+
+  "vim.easymotion": true,
+  "vim.incsearch": true,
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.hlsearch": true,
+  "vim.timeout": 500,
+  "vim.insertModeKeyBindings": [
+    {
+      "before": ["j", "j"],
+      "after": ["<Esc>"]
+    }
+  ],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": ["<leader>", "w"],
+      "commands": ["workbench.action.files.save"]
+    },
+    {
+      "before": ["<C-n>"],
+      "commands": [":nohl"]
+    },
+    {
+      "before": ["K"],
+      "commands": ["lineBreakInsert"],
+      "silent": true
+    },
+    {
+      "before": ["[", "m"],
+      "commands": [
+        {
+          "command": "gotoNextPreviousMember.previousMember",
+          "args": ["function", "method", "class"]
+        }
+      ]
+    },
+    {
+      "before": ["]", "m"],
+      "commands": [
+        {
+          "command": "gotoNextPreviousMember.nextMember",
+          "args": ["function", "method", "class"]
+        }
+      ]
+    },
+    {
+      "before": ["g", "d"],
+      "commands": ["editor.action.revealDefinition"]
+    },
+    {
+      "before": ["g", "D"],
+      "commands": ["editor.action.peekDefinition"]
+    },
+    {
+      "before": ["g", "r"],
+      "commands": ["editor.action.goToReferences"]
+    },
+    {
+      "before": ["<leader>", "f", "f"],
+      "commands": ["workbench.action.quickOpen"]
+    },
+    {
+      "before": ["<leader>", "f", "g"],
+      "commands": ["workbench.view.search"]
+    },
+    {
+      "before": ["<leader>", "n", "f"],
+      "commands": ["fileutils.newFileAtRoot"]
+    },
+    {
+      "before": ["<leader>", "n", "d"],
+      "commands": ["fileutils.newFolderAtRoot"]
+    },
+    {
+      "before": ["<leader>", "r", "n"],
+      "commands": ["fileutils.renameFile"]
+    },
+    {
+      "before": ["<leader>", "d", "f"],
+      "commands": ["fileutils.removeFile"]
+    },
+    {
+      "before": ["<leader>", "c", "p"],
+      "commands": ["fileutils.copyFileName"]
+    },
+    {
+      "before": ["<leader>", "c", "r"],
+      "commands": ["fileutils.copyRelativeFilePath"]
+    },
+    {
+      "before": ["<leader>", "r", "a"],
+      "commands": ["editor.action.changeAll"]
+    }
+  ],
+  "vim.leader": "<space>",
+  "vim.handleKeys": {
+    "<C-a>": false,
+    "<C-f>": false
+  },
+  "extensions.experimental.affinity": {
+    "vscodevim.vim": 1
+  },
+
+  "gotoNextPreviousMember.symbolKinds": ["class", "function", "method", "constructor"],
+
+  "errorLens.enabled": true,
+  "errorLens.enabledDiagnosticLevels": ["error", "warning", "info", "hint"],
+  "errorLens.fontSize": "14",
+  "errorLens.fontWeight": "bold",
+  "errorLens.fontStyleItalic": true,
+  "errorLens.gutterIconsEnabled": true,
+  "errorLens.messageTemplate": "$message",
+  "errorLens.delay": 0,
+
+  "prettier.singleQuote": false,
+  "prettier.trailingComma": "es5",
+  "prettier.tabWidth": 2,
+  "prettier.semi": true,
+  "prettier.printWidth": 100,
+
+  "ruff.path": ["ruff"],
+  "ruff.interpreter": ["python"],
+  "ruff.nativeServer": true,
+  "ruff.lint.select": ["E", "F", "UP", "B", "SIM", "I", "N", "ANN", "S", "PERF", "B008"],
+
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "vue"],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "eslint.run": "onSave",
+
+  "telemetry.enableTelemetry": false,
+  "dotnet.server.useOmnisharp": false,
+  "dotnetAcquisitionExtension.allowInvalidPaths": true,
+
+  "gitlens.codeLens.enabled": false,
+  "gitlens.currentLine.enabled": true,
+  "gitlens.hovers.currentLine.over": "line",
+  "gitlens.statusBar.enabled": true,
+
+  "hadolint.hadolintPath": "hadolint",
+
+  "shellcheck.executablePath": "shellcheck",
+  "shellcheck.run": "onSave",
+
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["twMerge\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
+  "tailwindCSS.classAttributes": ["class", "className", "classList", "ngClass", "tw"],
+  "tailwindCSS.suggestions": true,
+
+  "color-highlight.enable": true,
+  "color-highlight.matchRgbWithNoFunction": true,
+
+  "markdownlint.config": {
+    "MD013": false,
+    "MD033": false
+  },
+
+  "qt-qml.qmlls.enabled": true,
+  "qt-qml.qmlls.customExePath": "qmlls",
+  "qt-qml.qmlls.useQmlImportPathEnvVar": true,
+  "qt-qml.qmlls.customArgs": ["-E"],
+  "qt-qml.qmlls.additionalImportPaths": ["/usr/lib/qt6/qml", "/usr/lib/qt/qml"],
+  "qt-qml.qmlls.checkForQmllsUpdate": false,
+  "qt-qml.qmlls.buildDirectory": ".",
+
+  "codeium.enableCodeLens": false
+}

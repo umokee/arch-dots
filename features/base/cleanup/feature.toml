@@ -1,0 +1,29 @@
+id = "base.cleanup"
+description = "Migrated feature base.cleanup"
+
+[packages]
+pacman = ["pacman-contrib", "pacutils", "lostfiles"]
+aur = []
+
+[[dirs]]
+target = "/usr/local/bin"
+permissions = "755"
+
+[[files]]
+source = "templates/arch-gc.j2"
+target = "/usr/local/bin/arch-gc"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "755"
+
+[[systemd.system]]
+unit = "paccache.timer"
+enable = true
+start = true
+
+[[systemd.system]]
+unit = "fstrim.timer"
+enable = true
+start = true

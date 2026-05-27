@@ -1,0 +1,66 @@
+id = "base.boot"
+description = "Migrated feature base.boot"
+
+[packages]
+pacman = [
+  "grub",
+  "efibootmgr",
+  "os-prober",
+  "btrfs-progs",
+  "dosfstools",
+  "e2fsprogs",
+  "cryptsetup",
+  "lvm2",
+  "mkinitcpio",
+  "mkinitcpio-busybox",
+]
+aur = []
+
+[[dirs]]
+target = "/etc/default"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/udev/rules.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/sysctl.d"
+permissions = "755"
+
+[[files]]
+source = "templates/grub-default.j2"
+target = "/etc/default/grub"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/udev-ioscheduler.j2"
+target = "/etc/udev/rules.d/60-ioscheduler.rules"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/sysctl-boot.j2"
+target = "/etc/sysctl.d/90-user-boot.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[hooks]]
+name = "mkinitcpio"
+script = "mkinitcpio.sh"
+run = "post"
+
+[[hooks]]
+name = "grub-mkconfig"
+script = "grub-mkconfig.sh"
+run = "post"

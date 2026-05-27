@@ -1,0 +1,18 @@
+id = "programs.files"
+description = "Migrated feature programs.files"
+
+[packages]
+pacman = [
+  "nemo",
+  "dolphin",
+  "nemo-fileroller",
+  "gvfs",
+  "gvfs-mtp",
+  "gvfs-gphoto2",
+  "gvfs-smb",
+  "udisks2",
+  "udiskie",
+  "xarchiver",
+  "file-roller",
+]
+aur = []

@@ -1,0 +1,27 @@
+id = "base.fonts"
+description = "Migrated feature base.fonts"
+
+[packages]
+pacman = [
+  "fontconfig",
+  "ttf-dejavu",
+  "ttf-liberation",
+  "noto-fonts",
+  "noto-fonts-emoji",
+  "noto-fonts-cjk",
+  "noto-fonts-extra",
+]
+aur = []
+
+[[dirs]]
+target = "/etc/fonts"
+permissions = "755"
+
+[[files]]
+source = "templates/fontconfig-local.j2"
+target = "/etc/fonts/local.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"

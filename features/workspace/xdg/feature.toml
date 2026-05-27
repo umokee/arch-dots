@@ -1,0 +1,55 @@
+id = "workspace.xdg"
+description = "Migrated feature workspace.xdg"
+
+[packages]
+pacman = ["xdg-utils", "xdg-user-dirs"]
+aur = []
+
+[[dirs]]
+target = "/etc/xdg/xdg-desktop-portal"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config"
+permissions = "755"
+
+[[dirs]]
+target = "~/.local/share/applications"
+permissions = "755"
+
+[[files]]
+source = "templates/portal-conf.j2"
+target = "/etc/xdg/xdg-desktop-portal/portals.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/user-dirs-dirs.j2"
+target = "~/.config/user-dirs.dirs"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/user-dirs-locale.j2"
+target = "~/.config/user-dirs.locale"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/nvim-desktop.j2"
+target = "~/.local/share/applications/nvim.desktop"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/pgadmin4-desktop.j2"
+target = "~/.local/share/applications/pgadmin4.desktop"
+mode = "template"
+type = "file"
+permissions = "644"

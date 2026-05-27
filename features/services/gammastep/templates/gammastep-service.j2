@@ -1,0 +1,12 @@
+[Unit]
+Description=Gammastep
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/gammastep -l 43.1:131.9 -t 6500:3500
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

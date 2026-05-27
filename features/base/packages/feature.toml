@@ -1,0 +1,112 @@
+id = "base.packages"
+description = "Migrated feature base.packages"
+
+[packages]
+pacman = [
+  "base",
+  "base-devel",
+  "filesystem",
+  "xorg-xrdb",
+  "glibc",
+  "linux-firmware",
+  "pacman",
+  "systemd",
+  "systemd-sysvcompat",
+  "sudo",
+  "smartmontools",
+  "bash",
+  "git",
+  "curl",
+  "wget",
+  "nano",
+  "vim",
+  "neovim",
+  "coreutils",
+  "util-linux",
+  "shadow",
+  "pciutils",
+  "usbutils",
+  "lsof",
+  "gawk",
+  "tar",
+  "gzip",
+  "unzip",
+  "xz",
+  "zstd",
+  "lz4",
+  "bzip2",
+  "libarchive",
+  "zip",
+  "7zip",
+  "man-db",
+  "man-pages",
+  "texinfo",
+  "rsync",
+  "htop",
+  "btop",
+  "fastfetch",
+  "ripgrep",
+  "fd",
+  "fzf",
+  "jq",
+  "tree",
+  "pacman-contrib",
+  "reflector",
+  "libnotify",
+  "upower",
+  "less",
+  "bat",
+  "eza",
+  "lsd",
+  "inxi",
+  "wl-clipboard",
+  "exfatprogs",
+  "libva-utils",
+  "ffmpeg",
+  "ffmpegthumbnailer",
+  "arj",
+  "lrzip",
+  "lzop",
+  "pbzip2",
+  "pigz",
+  "pixz",
+  "unrar",
+  "brotli",
+  "cpio",
+]
+aur = []
+
+[[dirs]]
+target = "/etc"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config/environment.d"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config/npm"
+permissions = "755"
+
+[[files]]
+source = "templates/cachyos-pacman-example.j2"
+target = "/etc/pacman.conf.decman-cachyos-example"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/environment-user.j2"
+target = "~/.config/environment.d/10-user.conf"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/npmrc.j2"
+target = "~/.config/npm/npmrc"
+mode = "template"
+type = "file"
+permissions = "644"

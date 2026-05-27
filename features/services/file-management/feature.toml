@@ -1,0 +1,17 @@
+id = "services.file-management"
+description = "Migrated feature services.file-management"
+
+[packages]
+pacman = [
+  "nemo",
+  "nemo-fileroller",
+  "gvfs",
+  "gvfs-mtp",
+  "gvfs-gphoto2",
+  "gvfs-smb",
+  "udisks2",
+  "udiskie",
+  "xarchiver",
+  "file-roller",
+]
+aur = []

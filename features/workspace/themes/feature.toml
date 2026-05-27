@@ -1,0 +1,95 @@
+id = "workspace.themes"
+description = "Migrated feature workspace.themes"
+
+[packages]
+pacman = [
+  "ttf-firacode-nerd",
+  "ttf-hack-nerd",
+  "ttf-jetbrains-mono-nerd",
+  "otf-font-awesome",
+  "ttf-roboto",
+  "ttf-montserrat",
+  "ttf-opensans",
+  "ttf-cascadia-code",
+  "inter-font",
+  "qt5ct",
+  "qt6ct",
+  "qt5-wayland",
+  "qt6-wayland",
+  "adwaita-qt5",
+  "adwaita-qt6",
+  "papirus-icon-theme",
+  "adwaita-icon-theme",
+  "gtk3",
+  "gtk4",
+  "gsettings-desktop-schemas",
+  "dconf",
+  "nwg-look",
+]
+aur = [
+  "posy-cursors",
+  "tela-circle-icon-theme-blue-git",
+  "adw-gtk-theme-git",
+]
+
+[[dirs]]
+target = "~/.config/environment.d"
+permissions = "755"
+
+[[dirs]]
+target = "~/.icons/default"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config"
+permissions = "755"
+
+[[files]]
+source = "templates/theme-env.j2"
+target = "~/.config/environment.d/20-theme.conf"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/desktop-env.j2"
+target = "~/.config/environment.d/20-desktop.conf"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/cursor-index.j2"
+target = "~/.icons/default/index.theme"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "files/home/.config/gtk-3.0"
+target = "~/.config/gtk-3.0"
+mode = "link"
+type = "dir"
+
+[[files]]
+source = "files/home/.config/gtk-4.0"
+target = "~/.config/gtk-4.0"
+mode = "link"
+type = "dir"
+
+[[files]]
+source = "files/home/.config/qt5ct"
+target = "~/.config/qt5ct"
+mode = "link"
+type = "dir"
+
+[[files]]
+source = "files/home/.config/qt6ct"
+target = "~/.config/qt6ct"
+mode = "link"
+type = "dir"
+
+[[hooks]]
+name = "apply-gtk-dconf"
+script = "apply-gtk-dconf.sh"
+run = "post"

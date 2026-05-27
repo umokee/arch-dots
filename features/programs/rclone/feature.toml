@@ -1,0 +1,6 @@
+id = "programs.rclone"
+description = "Migrated feature programs.rclone"
+
+[packages]
+pacman = ["rclone", "rclone-browser"]
+aur = ["syncrclone"]

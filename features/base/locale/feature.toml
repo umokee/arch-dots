@@ -1,0 +1,38 @@
+id = "base.locale"
+description = "Migrated feature base.locale"
+
+[[dirs]]
+target = "/etc"
+permissions = "755"
+
+[[files]]
+source = "templates/locale-gen.j2"
+target = "/etc/locale.gen"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/locale-conf.j2"
+target = "/etc/locale.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/vconsole-conf.j2"
+target = "/etc/vconsole.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[hooks]]
+name = "locale-gen"
+script = "locale-gen.sh"
+run = "post"

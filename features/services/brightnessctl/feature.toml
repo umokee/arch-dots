@@ -1,0 +1,6 @@
+id = "services.brightnessctl"
+description = "Migrated feature services.brightnessctl"
+
+[packages]
+pacman = ["brightnessctl"]
+aur = []

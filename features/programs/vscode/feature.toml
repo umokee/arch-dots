@@ -1,0 +1,44 @@
+id = "programs.vscode"
+description = "Migrated feature programs.vscode"
+
+[packages]
+pacman = []
+aur = ["visual-studio-code-bin"]
+
+[[dirs]]
+target = "~/.config/environment.d"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config/Code/User"
+permissions = "755"
+
+[[files]]
+source = "templates/vscode-qml-env.j2"
+target = "~/.config/environment.d/30-vscode-qml.conf"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "files/home/.config/Code/User/settings.json"
+target = "~/.config/Code/User/settings.json"
+mode = "link"
+type = "file"
+
+[[files]]
+source = "files/home/.config/Code/User/keybindings.json"
+target = "~/.config/Code/User/keybindings.json"
+mode = "link"
+type = "file"
+
+[[files]]
+source = "files/home/.config/Code/User/extensions.txt"
+target = "~/.config/Code/User/extensions.txt"
+mode = "link"
+type = "file"
+
+[[hooks]]
+name = "vscode-extensions"
+script = "vscode-extensions.sh"
+run = "post"

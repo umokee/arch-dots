@@ -1,0 +1,22 @@
+id = "services.gammastep"
+description = "Migrated feature services.gammastep"
+
+[packages]
+pacman = ["gammastep"]
+aur = []
+
+[[dirs]]
+target = "~/.config/systemd/user"
+permissions = "755"
+
+[[files]]
+source = "templates/gammastep-service.j2"
+target = "~/.config/systemd/user/gammastep.service"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[systemd.user]]
+unit = "gammastep.service"
+enable = true
+start = true

@@ -1,0 +1,24 @@
+id = "services.docker"
+description = "Migrated feature services.docker"
+
+[packages]
+pacman = ["docker", "docker-compose", "docker-buildx"]
+aur = []
+
+[[dirs]]
+target = "/etc/docker"
+permissions = "755"
+
+[[files]]
+source = "templates/docker-daemon.j2"
+target = "/etc/docker/daemon.json"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[systemd.system]]
+unit = "docker.service"
+enable = true
+start = true

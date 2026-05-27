@@ -1,0 +1,33 @@
+id = "programs.lsp"
+description = "Migrated feature programs.lsp"
+
+[packages]
+pacman = [
+  "lua-language-server",
+  "stylua",
+  "ruff",
+  "python-black",
+  "python-isort",
+  "typescript-language-server",
+  "prettier",
+  "eslint_d",
+  "yaml-language-server",
+  "bash-language-server",
+  "shfmt",
+  "shellcheck",
+  "clang",
+  "clang-tools-extra",
+  "gopls",
+  "go",
+]
+aur = [
+  "nil-git",
+  "nixfmt",
+  "selene",
+  "basedpyright",
+  "dockerfile-language-server",
+  "tailwindcss-language-server",
+  "hadolint-bin",
+  "netcoredbg",
+  "omnisharp-roslyn",
+]
