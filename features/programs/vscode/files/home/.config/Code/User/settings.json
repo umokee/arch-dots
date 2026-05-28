@@ -6,8 +6,8 @@
   "workbench.iconTheme": "bearded-icons",
   "workbench.colorTheme": "Dark Lavender",
 
-  "http.proxy": "http://127.0.0.1:2090",
-  "http.proxyStrictSSL": false,
+  //"http.proxy": "http://127.0.0.1:2090",
+  //"http.proxyStrictSSL": false,
 
   "editor.formatOnSave": true,
   "editor.formatOnPaste": false,

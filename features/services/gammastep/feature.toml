@@ -19,4 +19,4 @@ permissions = "644"
 [[systemd.user]]
 unit = "gammastep.service"
 enable = true
-start = true
+start = false

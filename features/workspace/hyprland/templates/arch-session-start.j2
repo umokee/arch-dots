@@ -8,8 +8,72 @@ log() {
 export XDG_SESSION_TYPE="${XDG_SESSION_TYPE:-wayland}"
 export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-Hyprland}"
 export XDG_SESSION_DESKTOP="${XDG_SESSION_DESKTOP:-Hyprland}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 
-log "importing environment"
+lock_file="$XDG_RUNTIME_DIR/arch-session-start.lock"
+
+exec 9>"$lock_file"
+if ! flock -n 9; then
+  log "already running, skip"
+  exit 0
+fi
+
+detect_wayland_display() {
+  if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
+    return 0
+  fi
+
+  local sock
+  for sock in "$XDG_RUNTIME_DIR"/wayland-*; do
+    if [[ -S "$sock" ]]; then
+      export WAYLAND_DISPLAY="${sock##*/}"
+      log "detected WAYLAND_DISPLAY=$WAYLAND_DISPLAY"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+detect_hyprland_instance() {
+  if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+    return 0
+  fi
+
+  local dir
+  for dir in "$XDG_RUNTIME_DIR"/hypr/*; do
+    if [[ -S "$dir/.socket.sock" ]]; then
+      export HYPRLAND_INSTANCE_SIGNATURE="${dir##*/}"
+      log "detected HYPRLAND_INSTANCE_SIGNATURE=$HYPRLAND_INSTANCE_SIGNATURE"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+wait_hyprland() {
+  local i
+
+  for i in $(seq 1 100); do
+    detect_wayland_display || true
+    detect_hyprland_instance || true
+
+    if hyprctl monitors >/dev/null 2>&1; then
+      log "Hyprland is ready"
+      return 0
+    fi
+
+    sleep 0.1
+  done
+
+  log "Hyprland is not ready, continuing anyway"
+  return 0
+}
+
+wait_hyprland
+
+log "importing environment into dbus/systemd user manager"
 
 dbus-update-activation-environment --systemd \
   DISPLAY \
@@ -56,27 +120,13 @@ systemctl --user import-environment \
   XDG_STATE_HOME || true
 
 log "reloading user units"
-systemctl --user daemon-reload || true
+systemctl --user daemon-reload
 systemctl --user reset-failed || true
 
 log "starting graphical-session.target"
-systemctl --user start graphical-session.target
+systemctl --user start graphical-session.target || true
 
-# Важно: если target уже был active, новые enabled units могли не подтянуться.
-# Поэтому дополнительно стартуем enabled units из graphical-session.target.wants.
-wants_dir="$HOME/.config/systemd/user/graphical-session.target.wants"
-
-if [[ -d "$wants_dir" ]]; then
-  while IFS= read -r -d '' unit_path; do
-    unit="$(basename "$unit_path")"
-
-    case "$unit" in
-      *.service|*.socket|*.timer)
-        log "starting wanted unit: $unit"
-        systemctl --user start "$unit" || true
-        ;;
-    esac
-  done < <(find "$wants_dir" -mindepth 1 -maxdepth 1 -print0 2>/dev/null)
-fi
+log "starting arch-hyprland-session.target"
+systemctl --user start arch-hyprland-session.target
 
 log "done"

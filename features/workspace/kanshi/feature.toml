@@ -30,4 +30,4 @@ permissions = "644"
 [[systemd.user]]
 unit = "kanshi.service"
 enable = true
-start = true
+start = false

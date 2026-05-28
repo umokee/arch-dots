@@ -19,11 +19,6 @@ group = "root"
 permissions = "644"
 
 [[systemd.system]]
-unit = "getty@.service"
-enable = true
-start = true
-
-[[systemd.system]]
 unit = "dbus-broker.service"
 enable = true
 start = true
@@ -41,4 +36,4 @@ start = true
 [[systemd.system]]
 unit = "remote-fs.target"
 enable = true
-start = true
+start = false

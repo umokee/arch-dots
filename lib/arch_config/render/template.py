@@ -55,5 +55,8 @@ def render_template_text(text: str, data: dict[str, Any]) -> str:
         try:
             return eval_expr(expr, data)
         except KeyError as exc:
-            raise SystemExit(f"Unknown template variable/filter in '{{{{ {expr} }}}}': {exc}") from exc
+            raise SystemExit(
+                f"Unknown template variable/filter in '{{{{ {expr} }}}}': {exc}"
+            ) from exc
+
     return _EXPR_RE.sub(repl, text)

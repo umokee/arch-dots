@@ -19,4 +19,4 @@ permissions = "644"
 [[systemd.user]]
 unit = "swaybg-daemon.service"
 enable = true
-start = true
+start = false

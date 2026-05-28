@@ -5,8 +5,12 @@ log() {
   printf '[arch-session-stop] %s\n' "$*" >&2
 }
 
+log "stopping arch-hyprland-session.target"
+systemctl --user stop arch-hyprland-session.target || true
+
 log "stopping graphical-session.target"
 systemctl --user stop graphical-session.target || true
+
 systemctl --user reset-failed || true
 
 log "done"

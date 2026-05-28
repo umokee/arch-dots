@@ -1,12 +1,14 @@
 [Unit]
 Description=Kanshi output auto configuration
-PartOf=graphical-session.target
+PartOf=arch-hyprland-session.target graphical-session.target
 After=graphical-session.target
+Before=quickshell.service swaybg-daemon.service
 
 [Service]
+Type=simple
 ExecStart=/usr/bin/kanshi
 Restart=on-failure
 RestartSec=3
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=arch-hyprland-session.target

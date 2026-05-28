@@ -1,11 +1,11 @@
 [Unit]
-Description=Gammastep
+Description=KDE Polkit Authentication Agent
 PartOf=graphical-session.target
 After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/gammastep -l 43.1:131.9 -t 6500:3500
+ExecStart=/usr/lib/polkit-kde-authentication-agent-1
 Restart=on-failure
 RestartSec=2
 

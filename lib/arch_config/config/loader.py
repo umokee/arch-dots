@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
 import tomllib
 
 from arch_config.paths import FEATURES_DIR, PROFILES_DIR
@@ -44,5 +45,7 @@ def load_feature(feature_id: str) -> LoadedFeature:
     data = read_toml(path)
     actual = str(data.get("id", feature_id))
     if actual != feature_id:
-        raise SystemExit(f"Feature id mismatch in {path}: expected {feature_id}, got {actual}")
+        raise SystemExit(
+            f"Feature id mismatch in {path}: expected {feature_id}, got {actual}"
+        )
     return LoadedFeature(id=feature_id, root=path.parent, data=data)

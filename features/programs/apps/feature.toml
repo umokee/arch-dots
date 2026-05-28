@@ -4,7 +4,6 @@ description = "Migrated feature programs.apps"
 [packages]
 pacman = [
   "obsidian",
-  "chromium",
   "telegram-desktop",
   "libreoffice-fresh",
   "xorg-xlsclients",
@@ -20,7 +19,7 @@ pacman = [
   "network-manager-applet",
 ]
 aur = [
-  "claude-code",
+  "throne-bin",
   "winboat-bin",
   "spotify",
   "czkawka-gui",

@@ -1,0 +1,21 @@
+id = "services.podman"
+description = "Rootless Podman and podman-compose"
+
+[packages]
+pacman = [
+  "podman",
+  "podman-compose",
+  "buildah",
+  "skopeo",
+  "crun",
+  "fuse-overlayfs",
+  "slirp4netns",
+]
+aur = []
+
+[[hooks]]
+name = "podman-rootless"
+script = "podman-rootless.sh"
+run = "post"
+kind = "external-state"
+note = "Adds /etc/subuid and /etc/subgid entries for rootless Podman. archctl will not remove them automatically."

@@ -59,8 +59,12 @@ permissions = "644"
 name = "mkinitcpio"
 script = "mkinitcpio.sh"
 run = "post"
+kind = "generator"
+note = "Regenerates initramfs from current mkinitcpio configuration."
 
 [[hooks]]
 name = "grub-mkconfig"
 script = "grub-mkconfig.sh"
 run = "post"
+kind = "generator"
+note = "Regenerates /boot/grub/grub.cfg from current GRUB configuration."

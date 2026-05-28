@@ -1,11 +1,19 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any
 
 from arch_config.config.loader import load_feature, load_profile
-from arch_config.model import DirItem, FileItem, HookItem, LinkItem, MountItem, ResolvedState, SystemdItem
+from arch_config.model import (
+    DirItem,
+    FileItem,
+    HookItem,
+    LinkItem,
+    MountItem,
+    ResolvedState,
+    SystemdItem,
+)
+from arch_config.paths import HOOKS_DIR
 
 
 def _unique(items: list[str]) -> list[str]:
@@ -30,7 +38,9 @@ def expand_target(value: str) -> Path:
     return Path(value)
 
 
-def _condition_ok(item: dict[str, Any], profile: dict[str, Any], enabled_features: set[str]) -> bool:
+def _condition_ok(
+    item: dict[str, Any], profile: dict[str, Any], enabled_features: set[str]
+) -> bool:
     absent = item.get("condition_feature_absent")
     if isinstance(absent, str) and absent in enabled_features:
         return False
@@ -89,17 +99,39 @@ def _mounts(profile: dict[str, Any]) -> list[MountItem]:
     return result
 
 
+def hook_script_path(feature_root: Path, script: str) -> Path:
+    """
+    Новый путь:
+      features/<group>/<name>/hooks/<script>
+
+    Старый fallback:
+      hooks/<script>
+    """
+    local = feature_root / "hooks" / script
+
+    if local.exists():
+        return local
+
+    return HOOKS_DIR / script
+
+
 def resolve(profile_name: str) -> ResolvedState:
     profile = load_profile(profile_name)
     enabled_features = [str(item) for item in profile.get("features", [])]
     enabled_set = set(enabled_features)
 
-    state = ResolvedState(profile=profile_name, config=profile, features=enabled_features)
+    state = ResolvedState(
+        profile=profile_name, config=profile, features=enabled_features
+    )
     _append_cachyos(profile, state.pacman)
 
     for mount in _mounts(profile):
         state.mounts.append(mount)
-        state.systemd.append(SystemdItem(scope="system", unit=mount.enabled_unit, enable=True, start=True))
+        state.systemd.append(
+            SystemdItem(
+                scope="system", unit=mount.enabled_unit, enable=True, start=True
+            )
+        )
 
     for feature_id in enabled_features:
         feature = load_feature(feature_id)
@@ -110,13 +142,23 @@ def resolve(profile_name: str) -> ResolvedState:
             state.aur += [str(item) for item in packages.get("aur", [])]
 
         for raw in data.get("dirs", []) or []:
-            if not isinstance(raw, dict) or not _condition_ok(raw, profile, enabled_set):
+            if not isinstance(raw, dict) or not _condition_ok(
+                raw, profile, enabled_set
+            ):
                 continue
             target = str(raw["target"])
-            state.dirs.append(DirItem(target=target, target_abs=expand_target(target), permissions=str(raw.get("permissions", "755"))))
+            state.dirs.append(
+                DirItem(
+                    target=target,
+                    target_abs=expand_target(target),
+                    permissions=str(raw.get("permissions", "755")),
+                )
+            )
 
         for raw in data.get("files", []) or []:
-            if not isinstance(raw, dict) or not _condition_ok(raw, profile, enabled_set):
+            if not isinstance(raw, dict) or not _condition_ok(
+                raw, profile, enabled_set
+            ):
                 continue
             source = str(raw["source"])
             target = str(raw["target"])
@@ -139,26 +181,65 @@ def resolve(profile_name: str) -> ResolvedState:
             )
 
         for raw in data.get("links", []) or []:
-            if not isinstance(raw, dict) or not _condition_ok(raw, profile, enabled_set):
+            if not isinstance(raw, dict) or not _condition_ok(
+                raw, profile, enabled_set
+            ):
                 continue
             source = str(raw["source"])
             target = str(raw["target"])
-            state.links.append(LinkItem(source=source, source_abs=expand_target(source), target=target, target_abs=expand_target(target)))
+            state.links.append(
+                LinkItem(
+                    source=source,
+                    source_abs=expand_target(source),
+                    target=target,
+                    target_abs=expand_target(target),
+                )
+            )
 
         systemd = data.get("systemd", {})
         if isinstance(systemd, dict):
             for scope in ["system", "user"]:
                 for raw in systemd.get(scope, []) or []:
-                    if not isinstance(raw, dict) or not _condition_ok(raw, profile, enabled_set):
+                    if not isinstance(raw, dict) or not _condition_ok(
+                        raw, profile, enabled_set
+                    ):
                         continue
-                    state.systemd.append(SystemdItem(scope=scope, unit=str(raw["unit"]), enable=bool(raw.get("enable", True)), start=bool(raw.get("start", True))))
+                    state.systemd.append(
+                        SystemdItem(
+                            scope=scope,
+                            unit=str(raw["unit"]),
+                            enable=bool(raw.get("enable", True)),
+                            start=bool(raw.get("start", True)),
+                        )
+                    )
 
         for raw in data.get("hooks", []) or []:
-            if not isinstance(raw, dict) or not _condition_ok(raw, profile, enabled_set):
+            if not isinstance(raw, dict) or not _condition_ok(
+                raw, profile, enabled_set
+            ):
                 continue
-            state.hooks.append(HookItem(name=str(raw.get("name", raw.get("script", "hook"))), script=str(raw["script"]), run=str(raw.get("run", "post"))))
+
+            script = str(raw["script"])
+            cleanup = str(raw.get("cleanup", "") or "")
+
+            script_abs = hook_script_path(feature.root, script)
+            cleanup_abs = hook_script_path(feature.root, cleanup) if cleanup else None
+
+            state.hooks.append(
+                HookItem(
+                    feature=feature_id,
+                    name=str(raw["name"]),
+                    script=script,
+                    script_abs=str(script_abs),
+                    run=str(raw.get("run", "post")),
+                    kind=str(raw.get("kind", "external-state")),
+                    cleanup=cleanup,
+                    cleanup_abs=str(cleanup_abs) if cleanup_abs else "",
+                    note=str(raw.get("note", "") or ""),
+                )
+            )
 
     state.pacman = _unique(state.pacman)
     state.aur = _unique(state.aur)
-    # package duplicates are enough; file duplicates intentionally keep last visible in validation/generate order
+
     return state

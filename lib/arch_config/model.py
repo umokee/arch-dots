@@ -49,9 +49,15 @@ class SystemdItem:
 
 @dataclass(frozen=True)
 class HookItem:
+    feature: str
     name: str
     script: str
+    script_abs: str
     run: str = "post"
+    kind: str = "external-state"
+    cleanup: str = ""
+    cleanup_abs: str = ""
+    note: str = ""
 
 
 @dataclass(frozen=True)

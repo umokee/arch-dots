@@ -9,20 +9,12 @@ local filemanager = "nemo"
 local screenshot_area = os.getenv("HOME") .. "/.local/bin/screenshot-tool area"
 
 -- =========================
--- Autostart / exec-once
+-- Session bootstrap
 -- =========================
 
-hl.on("hyprland.start", function()
-  hl.exec_cmd("/usr/local/bin/arch-session-start")
-	-- hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
-	-- hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
-	hl.exec_cmd("echo 'Xft.dpi: 125' | xrdb -merge")
-	hl.exec_cmd("gsettings set org.gnome.desktop.interface text-scaling-factor 1.25")
-	hl.exec_cmd("steam")
-	hl.exec_cmd("telegram-desktop")
-	hl.exec_cmd("zen-browser")
-	hl.exec_cmd("spotify")
-end)
+-- hl.on("hyprland.start", function()
+-- 	smth...
+-- end)
 
 -- =========================
 -- Monitors
@@ -94,6 +86,14 @@ hl.config({
 		force_zero_scaling = false,
 	},
 
+  cursor = {
+    no_hardware_cursors = 1,
+    use_cpu_buffer = 2,
+    default_monitor = "DP-3",
+    inactive_timeout = 0,
+		sync_gsettings_theme = true,
+  },
+
 	input = {
 		kb_layout = "us,ru-custom",
 		kb_options = "grp:ctrl_shift_toggle",
@@ -118,12 +118,16 @@ hl.config({
 		resize_on_border = false,
 		allow_tearing = false,
 		layout = "dwindle",
+
+		["col.active_border"] = "rgba(7aa2f7ff)",
+		["col.inactive_border"] = "rgba(292e42aa)",
 	},
 
 	decoration = {
 		rounding = 0,
 		active_opacity = 1.0,
 		inactive_opacity = 1.0,
+		fullscreen_opacity = 1.0,
 
 		blur = {
 			enabled = false,
@@ -209,94 +213,88 @@ bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- Media keys
--- В твоём старом конфиге обе команды ставили громкость в 5%.
--- Здесь исправлено на повышение/понижение.
 bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"), { repeating = true })
 bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { repeating = true })
 
 -- =========================
--- Window rules
+-- Helpers for rules
 -- =========================
 
--- Floating windows
-hl.window_rule({
-	match = { class = "^(guifetch|yad|zenity|wev|feh|imv|system-config-printer|org.quickshell)$" },
-	float = true,
-})
+local function rule(match, options)
+	options.match = match
+	hl.window_rule(options)
+end
 
-hl.window_rule({
-	match = { class = "^(org.gnome.FileRoller|file-roller|blueman-manager)$" },
-	float = true,
-})
+local function float_class(class_regex)
+	rule({ class = class_regex }, {
+		float = true,
+	})
+end
 
-hl.window_rule({
-	match = { class = "^com.github.GradienceTeam.Gradience$" },
-	float = true,
-})
+local function float_class_sized(class_regex, width, height)
+	rule({ class = class_regex }, {
+		float = true,
+		size = { width, height },
+		center = true,
+	})
+end
 
--- Foot + nmtui
-hl.window_rule({
-	match = {
-		class = "^foot$",
-		title = "nmtui",
-	},
+local function float_title(title_regex)
+	rule({ title = title_regex }, {
+		float = true,
+	})
+end
+
+local function workspace_class(class_regex, workspace)
+	rule({ class = class_regex }, {
+		workspace = workspace,
+	})
+end
+
+-- =========================
+-- Window rules: floating
+-- =========================
+
+-- Tiny/tools/debug windows
+float_class("^(guifetch|yad|zenity|wev|feh|imv|swappy|org.quickshell)$")
+float_class("^(system-config-printer|nm-connection-editor|blueman-manager)$")
+float_class("^(org.gnome.FileRoller|file-roller|xarchiver)$")
+float_class("^com.github.GradienceTeam.Gradience$")
+
+-- Settings/control panels
+float_class_sized("^(org.gnome.Settings)$", "monitor_w*0.70", "monitor_h*0.80")
+float_class_sized("^(org.pulseaudio.pavucontrol|pavucontrol|yad-icon-browser)$", "monitor_w*0.60", "monitor_h*0.70")
+float_class_sized("^(nwg-look|qt5ct|qt6ct|kvantummanager)$", "monitor_w*0.50", "monitor_h*0.60")
+
+-- Terminal special tools
+rule({
+	class = "^foot$",
+	title = "^(nmtui|btop|htop)$",
+}, {
 	float = true,
 	size = { "monitor_w*0.60", "monitor_h*0.70" },
 	center = true,
 })
 
--- GNOME Settings
-hl.window_rule({
-	match = { class = "^org.gnome.Settings$" },
-	float = true,
-	size = { "monitor_w*0.70", "monitor_h*0.80" },
-	center = true,
-})
+-- Launchers/dialog helpers
+float_title("^(Open|Save|Save As|Select|Choose)( a)? (File|Folder)(s)?$")
+float_title("^File (Operation|Upload|Download)( Progress)?$")
+float_title("^(.* Properties|Export Image as PNG|GIMP Crash Debug|Library)$")
+float_title("^(Authentication Required|Password Required)$")
+float_title("^(Confirm|Confirmation|Warning|Error)$")
 
--- Pavucontrol & yad-icon-browser
-hl.window_rule({
-	match = { class = "^(org.pulseaudio.pavucontrol|yad-icon-browser)$" },
-	float = true,
-	size = { "monitor_w*0.60", "monitor_h*0.70" },
-	center = true,
-})
-
--- nwg-look
-hl.window_rule({
-	match = { class = "^nwg-look$" },
-	float = true,
-	size = { "monitor_w*0.50", "monitor_h*0.60" },
-	center = true,
-})
-
--- ATLauncher Console
-hl.window_rule({
-	match = {
-		class = "^com-atlauncher-App$",
-		title = "^ATLauncher Console$",
-	},
-	float = true,
-})
-
--- File dialogs
-hl.window_rule({
-	match = { title = "^(Select|Open)( a)? (File|Folder)(s)?$" },
-	float = true,
-})
-
-hl.window_rule({
-	match = { title = "^File (Operation|Upload)( Progress)?$" },
-	float = true,
-})
-
-hl.window_rule({
-	match = { title = "^(.* Properties|Export Image as PNG|GIMP Crash Debug|Save As|Library)$" },
+-- Java/ATLauncher
+rule({
+	class = "^com-atlauncher-App$",
+	title = "^ATLauncher Console$",
+}, {
 	float = true,
 })
 
 -- Picture-in-Picture
-hl.window_rule({
-	match = { title = "^Picture(-| )in(-| )[Pp]icture$" },
+rule({
+	title = "^Picture(-| )in(-| )[Pp]icture$",
+}, {
 	float = true,
 	pin = true,
 	keep_aspect_ratio = true,
@@ -306,120 +304,117 @@ hl.window_rule({
 	},
 })
 
--- Steam
-hl.window_rule({
-	match = {
-		class = "^steam$",
-		title = "^$",
-	},
+-- Steam popups
+rule({
+	class = "^steam$",
+	title = "^$",
+}, {
 	rounding = 10,
 })
 
-hl.window_rule({
-	match = {
-		class = "^steam$",
-		title = "^Friends List$",
-	},
+rule({
+	class = "^steam$",
+	title = "^(Friends List|Settings|Steam - News|Special Offers)$",
+}, {
 	float = true,
 })
 
--- Steam games
-hl.window_rule({
-	match = { class = "^steam_app_[0-9]+" },
+-- =========================
+-- Window rules: gaming / XWayland / Wine
+-- =========================
+
+rule({ class = "^steam_app_[0-9]+" }, {
 	workspace = "5 silent",
 	immediate = true,
 	idle_inhibit = "always",
 })
 
--- Wine / Proton .exe
-hl.window_rule({
-	match = { class = [[.*\.exe$]] },
+rule({ class = [[.*\.exe$]] }, {
 	workspace = "5 silent",
 	immediate = true,
 })
 
--- Fusion360
-hl.window_rule({
-	match = {
-		class = [[^fusion360\.exe$]],
-		title = "^(Fusion360|Marking Menu)$",
-	},
+rule({
+	class = [[^fusion360\.exe$]],
+	title = "^(Fusion360|Marking Menu)$",
+}, {
 	no_blur = true,
 })
 
--- Opaque windows
-hl.window_rule({
-	match = { class = "^(foot|equibop|org.quickshell|imv|swappy)$" },
-	opaque = true,
-})
-
--- XWayland windows
-hl.window_rule({
-	match = {
-		xwayland = true,
-		title = "^win[0-9]+$",
-	},
+rule({
+	xwayland = true,
+	title = "^win[0-9]+$",
+}, {
 	no_dim = true,
 	no_shadow = true,
 	rounding = 10,
 })
 
--- Fullscreen opacity
-hl.window_rule({
-	match = { fullscreen = false },
+-- =========================
+-- Window rules: opacity / native floating
+-- =========================
+
+rule({
+	class = "^(foot|org.quickshell|imv|swappy)$",
+}, {
+	opaque = true,
+})
+
+rule({
+	fullscreen = false,
+}, {
 	opacity = "1 override",
 })
 
--- Center floating native Wayland windows
-hl.window_rule({
-	match = {
-		float = true,
-		xwayland = false,
-	},
+rule({
+	float = true,
+	xwayland = false,
+}, {
 	center = true,
 })
 
--- Workspace assignments
-hl.window_rule({
-	match = { class = "^(firefox|zen-beta|google-chrome|chromium|brave-browser)$" },
-	workspace = "1",
-})
+-- =========================
+-- Window rules: workspaces
+-- =========================
 
-hl.window_rule({
-	match = { class = "^(code|vscodium|jetbrains-idea|jetbrains-clion|neovide)$" },
-	workspace = "2",
-})
+-- 1: Browsers
+workspace_class("^(firefox|zen|zen-browser|zen-beta|google-chrome|chromium|brave-browser)$", "1")
 
-hl.window_rule({
-	match = { class = "^(steam|lutris|heroic|com.usebottles.bottles|gamescope)$" },
-	workspace = "5 silent",
-})
+-- 2: Development
+workspace_class("^(code|Code|code-url-handler|vscodium|VSCodium|jetbrains-idea|jetbrains-clion|neovide)$", "2")
+workspace_class("^(pgadmin4|sqlitebrowser)$", "2")
 
-hl.window_rule({
-	match = { class = "^nemo$" },
-	workspace = "6",
-})
+-- 3: Notes/knowledge
+workspace_class("^(obsidian|Obsidian)$", "3")
 
-hl.window_rule({
-	match = { class = "^foot$" },
-	workspace = "7",
-})
+-- 4: Office/documents
+workspace_class("^(libreoffice|soffice|libreoffice-writer|libreoffice-calc|libreoffice-impress)$", "4")
 
-hl.window_rule({
-	match = { class = "^(yandex-music|spotify)$" },
-	workspace = "9",
-})
+-- 5: Games
+workspace_class("^(steam|lutris|heroic|com.usebottles.bottles|gamescope|ATLauncher|com-atlauncher-App)$", "5 silent")
 
-hl.window_rule({
-	match = { class = [[^(org\.telegram\.desktop|discord|vesktop|element-desktop)$]] },
-	workspace = "10",
-})
+-- 6: Files
+workspace_class("^(nemo|org.gnome.Nautilus|dolphin|org.kde.dolphin)$", "6")
 
--- JetBrains fix
-hl.window_rule({
-	match = {
-		class = "^(.*jetbrains.*)$",
-		title = "^(win.*)$",
-	},
+-- 7: Terminals
+workspace_class("^(foot|kitty|Alacritty|org.wezfurlong.wezterm)$", "7")
+
+-- 8: VMs / heavy system tools
+workspace_class("^(virt-manager|virt-viewer|VirtualBox Manager|winboat|WinBoat)$", "8")
+
+-- 9: Music/media
+workspace_class("^(yandex-music|spotify|Spotify|vlc|mpv)$", "9")
+
+-- 10: Chats
+workspace_class([[(org\.telegram\.desktop|telegram-desktop|discord|vesktop|equibop|element-desktop)$]], "10")
+
+-- 11: Screenshots / images / small visual tools
+workspace_class("^(imv|feh|swappy|obs)$", "11")
+
+-- JetBrains focus fix
+rule({
+	class = "^(.*jetbrains.*)$",
+	title = "^(win.*)$",
+}, {
 	no_initial_focus = true,
 })

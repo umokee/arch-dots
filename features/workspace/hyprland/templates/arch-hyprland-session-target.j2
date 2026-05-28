@@ -1,0 +1,10 @@
+[Unit]
+Description=Arch Hyprland graphical session
+Documentation=man:systemd.special(7)
+
+Wants=graphical-session-pre.target
+Wants=graphical-session.target
+BindsTo=graphical-session.target
+
+After=graphical-session-pre.target
+After=graphical-session.target

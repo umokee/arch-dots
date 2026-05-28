@@ -1,14 +1,51 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export XDG_SESSION_TYPE=wayland
-export XDG_CURRENT_DESKTOP=Hyprland
-export XDG_SESSION_DESKTOP=Hyprland
+export XDG_SESSION_TYPE="${XDG_SESSION_TYPE:-wayland}"
+export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-Hyprland}"
+export XDG_SESSION_DESKTOP="${XDG_SESSION_DESKTOP:-Hyprland}"
+
+hyprland_pid=""
+cleanup_done=0
+
+log() {
+  printf '[arch-hyprland-session] %s\n' "$*" >&2
+}
 
 cleanup() {
+  if [[ "$cleanup_done" -eq 1 ]]; then
+    return
+  fi
+
+  cleanup_done=1
   /usr/local/bin/arch-session-stop || true
 }
 
-trap cleanup EXIT INT TERM
+terminate_hyprland() {
+  if [[ -n "$hyprland_pid" ]]; then
+    kill -TERM "$hyprland_pid" 2>/dev/null || true
+  fi
+}
 
-exec Hyprland
+trap terminate_hyprland INT TERM
+trap cleanup EXIT
+
+if command -v start-hyprland >/dev/null 2>&1; then
+  log "starting Hyprland through start-hyprland"
+  start-hyprland &
+else
+  log "starting Hyprland directly"
+  Hyprland &
+fi
+
+hyprland_pid="$!"
+
+log "starting arch user session services"
+/usr/local/bin/arch-session-start || true
+
+set +e
+wait "$hyprland_pid"
+status="$?"
+set -e
+
+exit "$status"

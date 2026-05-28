@@ -2,10 +2,17 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 PROFILE="${ARCH_PROFILE:-desktop}"
-SKIP_INSTALL="${ARCHCTL_SKIP_INSTALL:-0}"
-BOOTSTRAP_CACHYOS="${ARCHCTL_BOOTSTRAP_CACHYOS:-auto}"
 BUILD_USER="${ARCHCTL_BUILD_USER:-}"
+AUR=1
+STRICT=0
+REMOVE_ORPHANS=0
+YES=0
+RUN_SWITCH=0
+RUN_CHECKS=1
+INSTALL_COMPLETIONS=0
+BOOTSTRAP_CACHYOS="${ARCHCTL_BOOTSTRAP_CACHYOS:-auto}"
 
 log() {
   printf '\n== %s ==\n' "$*"
@@ -24,10 +31,128 @@ has() {
   command -v "$1" > /dev/null 2>&1
 }
 
+usage() {
+  cat << USAGE
+Usage:
+  ./scripts/bootstrap.sh [options]
+
+Options:
+  -p, --profile NAME        Profile to use. Default: ${PROFILE}
+  --user NAME               Non-root build/user account. Default: auto-detect
+
+  --cachyos                 Force CachyOS repo bootstrap
+  --no-cachyos              Disable CachyOS repo bootstrap
+  --cachyos-auto            Use config/common.toml [cachyos].bootstrap_repos. Default
+
+  --aur                     Install/use AUR helper. Default
+  --no-aur                  Do not install/use AUR helper
+
+  --check                   Run validate/self-test/generate checks. Default
+  --no-check                Skip checks
+
+  --install-completions     Install shell completions for current shell
+
+  --switch                  After bootstrap, run archctl switch
+  --strict                  With --switch, enable strict package cleanup
+  --remove-orphans          With --strict, also remove orphan packages
+  -y, --yes                 Non-interactive yes for archctl switch/prune
+
+  -h, --help                Show this help
+
+Recommended first run:
+  ./scripts/bootstrap.sh -p desktop
+
+Then inspect:
+  ./scripts/archctl -p desktop diff --strict --aur
+
+Then apply:
+  ./scripts/archctl -p desktop switch --aur --strict
+USAGE
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+  -p | --profile)
+    PROFILE="${2:-}"
+    [ -n "$PROFILE" ] || die "missing value for $1"
+    shift 2
+    ;;
+  --user)
+    BUILD_USER="${2:-}"
+    [ -n "$BUILD_USER" ] || die "missing value for $1"
+    shift 2
+    ;;
+  --cachyos)
+    BOOTSTRAP_CACHYOS=1
+    shift
+    ;;
+  --no-cachyos)
+    BOOTSTRAP_CACHYOS=0
+    shift
+    ;;
+  --cachyos-auto)
+    BOOTSTRAP_CACHYOS=auto
+    shift
+    ;;
+  --aur)
+    AUR=1
+    shift
+    ;;
+  --no-aur)
+    AUR=0
+    shift
+    ;;
+  --check)
+    RUN_CHECKS=1
+    shift
+    ;;
+  --no-check)
+    RUN_CHECKS=0
+    shift
+    ;;
+  --install-completions)
+    INSTALL_COMPLETIONS=1
+    shift
+    ;;
+  --switch)
+    RUN_SWITCH=1
+    shift
+    ;;
+  --strict)
+    STRICT=1
+    shift
+    ;;
+  --remove-orphans)
+    REMOVE_ORPHANS=1
+    shift
+    ;;
+  -y | --yes)
+    YES=1
+    shift
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  *)
+    die "unknown option: $1"
+    ;;
+  esac
+done
+
 ensure_arch_like() {
   if ! has pacman; then
     die "pacman was not found. This bootstrap is only for Arch/CachyOS-like systems."
   fi
+}
+
+ensure_pacman_keyring() {
+  log "Checking pacman keyring"
+
+  run_as_root pacman-key --init || true
+  run_as_root pacman-key --populate archlinux || true
+
+  run_as_root pacman -Sy --needed --noconfirm archlinux-keyring ca-certificates
 }
 
 detect_build_user() {
@@ -46,7 +171,7 @@ detect_build_user() {
     return
   fi
 
-  die "cannot detect non-root build user. Run bootstrap as your normal user or set ARCHCTL_BUILD_USER=<username>"
+  die "cannot detect non-root user. Run bootstrap as normal user or pass --user NAME"
 }
 
 ensure_build_user() {
@@ -55,8 +180,12 @@ ensure_build_user() {
   fi
 
   if ! id "$BUILD_USER" > /dev/null 2>&1; then
-    die "build user does not exist: $BUILD_USER"
+    die "user does not exist: $BUILD_USER"
   fi
+}
+
+user_home() {
+  getent passwd "$BUILD_USER" | cut -d: -f6
 }
 
 run_as_root() {
@@ -84,7 +213,7 @@ run_as_root() {
   die "need root privileges, but neither working sudo nor su was found"
 }
 
-run_as_build_user() {
+run_as_user() {
   local dir="$1"
   shift
 
@@ -96,8 +225,6 @@ run_as_build_user() {
     return
   fi
 
-  ensure_build_user
-
   local quoted_cmd
   local quoted_dir
 
@@ -105,15 +232,6 @@ run_as_build_user() {
   printf -v quoted_dir "%q" "$dir"
 
   su - "$BUILD_USER" -c "cd $quoted_dir && $quoted_cmd"
-}
-
-prepare_build_dir() {
-  local dir="$1"
-
-  if [ "$(id -u)" -eq 0 ]; then
-    ensure_build_user
-    chown -R "$BUILD_USER:$(id -gn "$BUILD_USER")" "$dir"
-  fi
 }
 
 read_toml_bool_from_section() {
@@ -136,7 +254,6 @@ read_toml_bool_from_section() {
     in_section {
       line = $0
       sub(/[[:space:]]*#.*/, "", line)
-
       pattern = "^[[:space:]]*" key "[[:space:]]*=[[:space:]]*true[[:space:]]*$"
 
       if (line ~ pattern) {
@@ -170,7 +287,6 @@ read_toml_string_from_section() {
     in_section {
       line = $0
       sub(/[[:space:]]*#.*/, "", line)
-
       pattern = "^[[:space:]]*" key "[[:space:]]*="
 
       if (line ~ pattern) {
@@ -208,6 +324,19 @@ cachyos_repo_url() {
     echo "https://mirror.cachyos.org/cachyos-repo.tar.xz"
 }
 
+install_minimal_pacman_tools() {
+  log "Installing minimal bootstrap tools"
+
+  run_as_root pacman -Sy --needed --noconfirm \
+    archlinux-keyring \
+    ca-certificates \
+    curl \
+    git \
+    sudo \
+    python \
+    base-devel
+}
+
 install_cachyos_repos_if_enabled() {
   if ! cachyos_bootstrap_enabled; then
     echo "CachyOS repository bootstrap is disabled."
@@ -228,23 +357,55 @@ install_cachyos_repos_if_enabled() {
     bash "$ROOT/scripts/bootstrap-cachyos-repos.sh"
 }
 
-install_bootstrap_pacman_packages() {
-  log "Installing bootstrap pacman packages"
+install_bootstrap_packages() {
+  log "Installing bootstrap packages"
 
   run_as_root pacman -Syu --needed --noconfirm \
     git \
     base-devel \
     go \
     python \
+    python-pip \
     rsync \
     unzip \
     sudo \
     pacman-contrib \
     curl \
-    wget
+    wget \
+    jq \
+    fish
+}
+
+install_archctl_link() {
+  local home
+  home="$(user_home)"
+
+  [ -n "$home" ] || die "cannot determine home for $BUILD_USER"
+
+  log "Installing archctl wrapper for $BUILD_USER"
+
+  if [ "$(id -u)" -ne 0 ]; then
+    mkdir -p "$HOME/.local/bin"
+    ln -sfn "$ROOT/scripts/archctl" "$HOME/.local/bin/archctl"
+    chmod +x "$ROOT/scripts/archctl"
+    echo "installed: $HOME/.local/bin/archctl -> $ROOT/scripts/archctl"
+    return
+  fi
+
+  install -d -o "$BUILD_USER" -g "$(id -gn "$BUILD_USER")" "$home/.local/bin"
+  ln -sfn "$ROOT/scripts/archctl" "$home/.local/bin/archctl"
+  chown -h "$BUILD_USER:$(id -gn "$BUILD_USER")" "$home/.local/bin/archctl"
+  chmod +x "$ROOT/scripts/archctl"
+
+  echo "installed: $home/.local/bin/archctl -> $ROOT/scripts/archctl"
 }
 
 install_yay_if_needed() {
+  if [ "$AUR" != "1" ]; then
+    echo "AUR helper bootstrap is disabled."
+    return
+  fi
+
   if has yay; then
     echo "yay already installed"
     return
@@ -254,21 +415,22 @@ install_yay_if_needed() {
 
   local tmp
   tmp="$(mktemp -d /tmp/archctl-yay.XXXXXX)"
-  prepare_build_dir "$tmp"
 
-  run_as_build_user "$tmp" \
-    git clone https://aur.archlinux.org/yay.git
+  if [ "$(id -u)" -eq 0 ]; then
+    chown -R "$BUILD_USER:$(id -gn "$BUILD_USER")" "$tmp"
+  fi
 
-  if run_as_build_user "$tmp/yay" \
-    makepkg -si --needed --noconfirm; then
+  run_as_user "$tmp" git clone https://aur.archlinux.org/yay.git
+
+  if run_as_user "$tmp/yay" makepkg -si --needed --noconfirm; then
     echo "yay installed"
+    rm -rf "$tmp"
     return
   fi
 
   warn "makepkg -si failed. Trying fallback: makepkg + root pacman -U"
 
-  run_as_build_user "$tmp/yay" \
-    makepkg --needed --noconfirm
+  run_as_user "$tmp/yay" makepkg --needed --noconfirm
 
   local pkgfile
   pkgfile="$(find "$tmp/yay" -maxdepth 1 -type f -name '*.pkg.tar*' ! -name '*-debug-*' | head -n 1)"
@@ -283,65 +445,114 @@ install_yay_if_needed() {
     die "yay installation finished, but yay is still not in PATH"
   fi
 
+  rm -rf "$tmp"
   echo "yay installed"
 }
 
-install_aur_package_with_yay() {
-  local package="$1"
-
-  if ! has yay; then
-    die "yay is required before installing AUR package: $package"
-  fi
-
-  log "Installing AUR package with yay: $package"
-
-  if run_as_build_user "$ROOT" \
-    yay -S --needed --noconfirm "$package"; then
-    return
-  fi
-
-  die "yay failed to install AUR package: $package"
-}
-
-install_launcher() {
-  if [ "$SKIP_INSTALL" = "1" ]; then
-    echo "launcher installation skipped"
-    return
-  fi
-
-  log "Installing archctl launcher"
-  "$ROOT/scripts/archctl" install --force
-}
-
 run_checks() {
-  log "Checking repository"
-  "$ROOT/scripts/archctl" -p "$PROFILE" doctor || true
+  if [ "$RUN_CHECKS" != "1" ]; then
+    echo "bootstrap checks are disabled."
+    return
+  fi
+
+  log "Checking archctl"
+
+  "$ROOT/scripts/archctl" --version
 
   log "Validating profile: $PROFILE"
   "$ROOT/scripts/archctl" -p "$PROFILE" validate
+
+  log "Running self-test"
+  "$ROOT/scripts/archctl" -p "$PROFILE" self-test --all-profiles --no-render
+
+  log "Generating files"
+  "$ROOT/scripts/archctl" -p "$PROFILE" generate
+
+  log "Checking generated files"
+  "$ROOT/scripts/archctl" -p "$PROFILE" check-generated
+}
+
+install_completions() {
+  if [ "$INSTALL_COMPLETIONS" != "1" ]; then
+    return
+  fi
+
+  local shell_name="${SHELL##*/}"
+
+  case "$shell_name" in
+  fish | bash | zsh)
+    log "Installing $shell_name completions"
+
+    if "$ROOT/scripts/archctl" completions "$shell_name" --install --force; then
+      echo "completions installed for $shell_name"
+    else
+      warn "failed to install completions for $shell_name; continuing"
+    fi
+    ;;
+  *)
+    warn "unsupported shell for completions: $shell_name"
+    ;;
+  esac
+}
+
+run_switch_if_requested() {
+  if [ "$RUN_SWITCH" != "1" ]; then
+    return
+  fi
+
+  log "Applying profile: $PROFILE"
+
+  local args=("-p" "$PROFILE" "switch")
+
+  if [ "$AUR" = "1" ]; then
+    args+=("--aur")
+  fi
+
+  if [ "$STRICT" = "1" ]; then
+    args+=("--strict")
+  fi
+
+  if [ "$REMOVE_ORPHANS" = "1" ]; then
+    args+=("--remove-orphans")
+  fi
+
+  if [ "$YES" = "1" ]; then
+    args+=("--yes")
+  fi
+
+  "$ROOT/scripts/archctl" "${args[@]}"
 }
 
 main() {
+  cd "$ROOT"
+
   ensure_arch_like
   ensure_build_user
 
+  log "Bootstrap target"
+  echo "Root:       $ROOT"
+  echo "Profile:    $PROFILE"
+  echo "User:       $BUILD_USER"
+  echo "AUR:        $AUR"
+  echo "CachyOS:    $BOOTSTRAP_CACHYOS"
+  echo "Run checks: $RUN_CHECKS"
+  echo "Run switch: $RUN_SWITCH"
+
+  ensure_pacman_keyring
+  install_minimal_pacman_tools
   install_cachyos_repos_if_enabled
-
-  install_bootstrap_pacman_packages
-
+  install_bootstrap_packages
+  install_archctl_link
   install_yay_if_needed
-
-  install_launcher
-
   run_checks
+  install_completions
+  run_switch_if_requested
 
   log "Done"
 
-  echo "Profile: $PROFILE"
-  echo
-  echo "Next commands:"
-  echo "  ./scripts/archctl -p $PROFILE diff"
-  echo "  ./scripts/archctl -p $PROFILE switch --strict --aur --no-prune-aur"
+  echo "Next safe commands:"
+  echo "  ./scripts/archctl -p $PROFILE diff --strict --aur"
+  echo "  ./scripts/archctl -p $PROFILE switch --aur --strict"
 }
 
 main "$@"

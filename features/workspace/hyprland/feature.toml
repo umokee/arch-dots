@@ -4,7 +4,7 @@ description = "Migrated feature workspace.hyprland"
 [packages]
 pacman = [
   "hyprland",
-  "uwsm",
+  "dbus",
   "xorg-xwayland",
   "xdg-desktop-portal",
   "xdg-desktop-portal-hyprland",
@@ -37,6 +37,10 @@ permissions = "755"
 
 [[dirs]]
 target = "~/.config"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config/systemd/user"
 permissions = "755"
 
 [[dirs]]
@@ -77,6 +81,13 @@ mode = "link"
 type = "dir"
 
 [[files]]
+source = "templates/arch-hyprland-session-target.j2"
+target = "~/.config/systemd/user/arch-hyprland-session.target"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
 source = "templates/arch-session-start.j2"
 target = "/usr/local/bin/arch-session-start"
 mode = "template"
@@ -111,3 +122,46 @@ type = "file"
 owner = "root"
 group = "root"
 permissions = "644"
+
+[[files]]
+source = "templates/arch-autostart-apps.j2"
+target = "~/.local/bin/arch-autostart-apps"
+mode = "template"
+type = "file"
+permissions = "755"
+
+[[files]]
+source = "templates/arch-autostart-apps-service.j2"
+target = "~/.config/systemd/user/arch-autostart-apps.service"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/polkit-kde-agent-service.j2"
+target = "~/.config/systemd/user/polkit-kde-agent.service"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/nm-applet-service.j2"
+target = "~/.config/systemd/user/nm-applet.service"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[systemd.user]]
+unit = "nm-applet.service"
+enable = true
+start = false
+
+[[systemd.user]]
+unit = "arch-autostart-apps.service"
+enable = true
+start = false
+
+[[systemd.user]]
+unit = "polkit-kde-agent.service"
+enable = true
+start = false

@@ -1,8 +1,13 @@
 id = "services.docker"
-description = "Migrated feature services.docker"
+description = "Docker Engine for WinBoat and local containers"
 
 [packages]
-pacman = ["docker", "docker-compose", "docker-buildx"]
+pacman = [
+  "docker",
+  "docker-compose",
+  "docker-buildx",
+  "runc",
+]
 aur = []
 
 [[dirs]]
@@ -10,7 +15,7 @@ target = "/etc/docker"
 permissions = "755"
 
 [[files]]
-source = "templates/docker-daemon.j2"
+source = "templates/daemon.json.j2"
 target = "/etc/docker/daemon.json"
 mode = "template"
 type = "file"
@@ -22,3 +27,10 @@ permissions = "644"
 unit = "docker.service"
 enable = true
 start = true
+
+[[hooks]]
+name = "docker-user-groups"
+script = "docker-user-groups.sh"
+run = "post"
+kind = "external-state"
+note = "Adds the user to docker/kvm groups. archctl will not remove the user from groups automatically."

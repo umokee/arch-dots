@@ -44,13 +44,11 @@ features = [
   "programs.files",
   "programs.shell",
   "services.postgresql",
-  "services.virtual-machine",
-  "services.xray",
   "services.openssh",
   "services.gammastep",
   "services.file-management",
   "services.fstrim",
-  "services.kanata",
+  "services.docker",
 ]
 
 [default]
