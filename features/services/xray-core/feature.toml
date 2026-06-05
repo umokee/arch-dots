@@ -25,13 +25,6 @@ run = "post"
 kind = "sync"
 note = "Installs Xray-core, disables 3x-ui, generates config.json and client link."
 
-[[hooks]]
-name = "cleanup-xray-core"
-script = "cleanup-xray-core.sh"
-run = "cleanup"
-kind = "cleanup"
-note = "Stops native Xray service when feature is disabled."
-
 [[systemd.system]]
 unit = "xray.service"
 enable = true
