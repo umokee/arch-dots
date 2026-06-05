@@ -64,7 +64,8 @@ sni = "www.nvidia.com"
 target = "www.nvidia.com:443"
 
 uuid = "cdcabd9c-7292-4886-a1fc-767082745767"
-private_key = "UCrkO04aZfi8pnwu7wlgC_2QbUs3qByJCQicK6MWcmo"
+private_key = "6Cjy4cOIuY2I5RPYgotlOfsRsKUvXW8iVICfiLaPCkk"
+public_key = "SX6bGQjzOtpap-sUsjyiYFq_6UtK6Pf7JMOmfg1jBTE"
 short_id = "7e124cb33c130836"
 xhttp_path = "/f8e2f68b38287d4e"
 

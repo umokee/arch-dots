@@ -25,6 +25,7 @@ XRAY_SNI="${XRAY_SNI:-www.nvidia.com}"
 
 XRAY_UUID="${XRAY_UUID:?XRAY_UUID is required}"
 XRAY_PRIVATE_KEY="${XRAY_PRIVATE_KEY:?XRAY_PRIVATE_KEY is required}"
+XRAY_PUBLIC_KEY="${XRAY_PUBLIC_KEY:?XRAY_PUBLIC_KEY is required}"
 XRAY_SHORT_ID="${XRAY_SHORT_ID:?XRAY_SHORT_ID is required}"
 XRAY_XHTTP_PATH="${XRAY_XHTTP_PATH:?XRAY_XHTTP_PATH is required}"
 
@@ -182,33 +183,14 @@ stop_3xui() {
   fi
 }
 
-public_from_private() {
-  local private_key="$1"
-  local output=""
-
-  output="$(xray x25519 -i "${private_key}" 2>&1 || true)"
-
-  printf '%s\n' "${output}" |
-    sed -nE 's/^[[:space:]]*[Pp]ublic key:[[:space:]]*//p' |
-    tail -n 1
-}
-
 write_links() {
-  local public_key=""
   local encoded_path=""
   local link=""
   local tmp_links=""
 
-  public_key="$(public_from_private "${XRAY_PRIVATE_KEY}")"
-
-  if [[ -z ${public_key} ]]; then
-    echo "Failed to derive public key from private key"
-    exit 1
-  fi
-
   encoded_path="${XRAY_XHTTP_PATH//\//%2F}"
 
-  link="vless://${XRAY_UUID}@${XRAY_PUBLIC_HOST}:${XRAY_PORT}?encryption=none&security=reality&sni=${XRAY_SNI}&fp=${XRAY_FINGERPRINT}&pbk=${public_key}&sid=${XRAY_SHORT_ID}&type=xhttp&path=${encoded_path}&mode=${XRAY_XHTTP_MODE}#${XRAY_CLIENT_NAME}"
+  link="vless://${XRAY_UUID}@${XRAY_PUBLIC_HOST}:${XRAY_PORT}?encryption=none&security=reality&sni=${XRAY_SNI}&fp=${XRAY_FINGERPRINT}&pbk=${XRAY_PUBLIC_KEY}&sid=${XRAY_SHORT_ID}&type=xhttp&path=${encoded_path}&mode=${XRAY_XHTTP_MODE}#${XRAY_CLIENT_NAME}"
 
   tmp_links="$(mktemp)"
 
@@ -233,7 +215,7 @@ Manual client fields:
   security: reality
   sni: ${XRAY_SNI}
   fingerprint: ${XRAY_FINGERPRINT}
-  public key: ${public_key}
+  public key: ${XRAY_PUBLIC_KEY}
   short id: ${XRAY_SHORT_ID}
   flow: empty / none
   mux: disabled
