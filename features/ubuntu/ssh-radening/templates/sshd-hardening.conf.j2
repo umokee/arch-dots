@@ -1,0 +1,25 @@
+# Managed by archctl
+
+Port {{ ssh.port | default(22) }}
+Protocol 2
+
+PermitRootLogin {{ ssh.permit_root_login | default("no") }}
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitEmptyPasswords no
+
+AuthenticationMethods publickey
+AllowUsers {{ ssh.allow_users | join(' ') }}
+
+X11Forwarding no
+AllowAgentForwarding no
+AllowTcpForwarding {{ ssh.allow_tcp_forwarding | default("yes") }}
+PermitTunnel no
+
+ClientAliveInterval 300
+ClientAliveCountMax 2
+
+MaxAuthTries 3
+MaxSessions 3
+LoginGraceTime 30

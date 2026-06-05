@@ -4,27 +4,10 @@ home = "/root"
 machine_type = "server"
 platform = "ubuntu"
 
-features = [
-  "ubuntu.server-base",
-  "services.3x-ui",
-]
+features = ["ubuntu.server-base", "ubuntu.ssh-hardening", "services.3x-ui"]
 
-[xray]
-port = 443
-
-# Сгенерировать:
-#   cat /proc/sys/kernel/random/uuid
-uuid = "CHANGE_ME_UUID"
-
-# После установки xray:
-#   sudo xray x25519
-private_key = "CHANGE_ME_PRIVATE_KEY"
-
-# short_id:
-#   openssl rand -hex 8
-short_id = "CHANGE_ME_SHORT_ID"
-
-# Сайт-маскировка для REALITY.
-# Можно заменить на другой стабильный TLS-сайт.
-server_name = "www.microsoft.com"
-reality_dest = "www.microsoft.com:443"
+[ssh]
+port = 22
+permit_root_login = "no"
+allow_users = ["admin"]
+allow_tcp_forwarding = "yes"

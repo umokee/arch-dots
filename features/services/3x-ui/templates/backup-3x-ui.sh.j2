@@ -3,14 +3,27 @@ set -euo pipefail
 
 backup_dir="/opt/3x-ui/backups"
 stamp="$(date +%Y-%m-%d_%H-%M-%S)"
-archive="$backup_dir/3x-ui-$stamp.tar.gz"
+archive="$backup_dir/3x-ui-native-$stamp.tar.gz"
 
 mkdir -p "$backup_dir"
 
-tar -czf "$archive" \
-  -C /opt/3x-ui \
-  db cert
+items=()
 
-find "$backup_dir" -type f -name '3x-ui-*.tar.gz' -mtime +14 -delete
+if [[ -d /etc/x-ui ]]; then
+  items+=("etc/x-ui")
+fi
+
+if [[ -d /root/cert ]]; then
+  items+=("root/cert")
+fi
+
+if [[ "${#items[@]}" -eq 0 ]]; then
+  echo "Nothing to backup: /etc/x-ui and /root/cert not found"
+  exit 0
+fi
+
+tar -czf "$archive" -C / "${items[@]}"
+
+find "$backup_dir" -type f -name '3x-ui-native-*.tar.gz' -mtime +14 -delete
 
 echo "Backup created: $archive"
