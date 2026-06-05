@@ -139,8 +139,11 @@ install_deps() {
 
 install_xray() {
   local need_install=0
+  local tmp_dir=""
+  local install_script=""
+  local install_args=()
 
-  if ! command -v xray > /dev/null 2>&1; then
+  if ! command -v xray >/dev/null 2>&1; then
     need_install=1
   fi
 
@@ -148,19 +151,33 @@ install_xray() {
     need_install=1
   fi
 
-  if [[ ${need_install} -eq 0 ]]; then
-    echo "Xray is already installed"
+  if [[ "${need_install}" -eq 0 ]]; then
+    echo "Xray is already installed; skip official installer"
     return 0
   fi
 
-  echo "Installing/updating Xray-core"
+  echo "Installing/updating Xray-core with official XTLS installer"
+
+  tmp_dir="$(mktemp -d)"
+  install_script="${tmp_dir}/install-release.sh"
 
   curl -fsSL \
-    https://github.com/XTLS/Xray-install/raw/main/install-release.sh \
-    -o /tmp/xray-install-release.sh
+    --retry 5 \
+    --retry-delay 5 \
+    -o "${install_script}" \
+    "https://github.com/XTLS/Xray-install/raw/main/install-release.sh"
 
-  chmod +x /tmp/xray-install-release.sh
-  bash /tmp/xray-install-release.sh install
+  chmod +x "${install_script}"
+
+  install_args=(install)
+
+  if bool_true "${XRAY_FORCE_UPDATE}"; then
+    install_args+=(--force)
+  fi
+
+  bash "${install_script}" "${install_args[@]}"
+
+  rm -rf "${tmp_dir}"
 }
 
 stop_3xui() {
