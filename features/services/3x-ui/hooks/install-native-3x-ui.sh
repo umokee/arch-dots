@@ -12,15 +12,63 @@ generated_file="/etc/archctl/3x-ui.generated.env"
 
 gen_alnum() {
   local length="$1"
-  python3 - "$length" <<'PY'
-import secrets
-import string
-import sys
+  tr -dc 'A-Za-z0-9' </dev/urandom | head -c "${length}"
+}
 
-length = int(sys.argv[1])
-alphabet = string.ascii_letters + string.digits
-print(''.join(secrets.choice(alphabet) for _ in range(length)), end='')
-PY
+wait_apt_locks() {
+  local locks=(
+    /var/lib/dpkg/lock-frontend
+    /var/lib/dpkg/lock
+    /var/cache/apt/archives/lock
+    /var/lib/apt/lists/lock
+  )
+
+  local lock
+  local waited=0
+
+  while true; do
+    local busy=0
+
+    for lock in "${locks[@]}"; do
+      if command -v fuser >/dev/null 2>&1; then
+        if fuser "$lock" >/dev/null 2>&1; then
+          busy=1
+          echo "apt/dpkg lock is busy: $lock"
+        fi
+      else
+        if lsof "$lock" >/dev/null 2>&1; then
+          busy=1
+          echo "apt/dpkg lock is busy: $lock"
+        fi
+      fi
+    done
+
+    if [[ "$busy" -eq 0 ]]; then
+      break
+    fi
+
+    waited=$((waited + 10))
+
+    if [[ "$waited" -gt 1800 ]]; then
+      echo "Timed out waiting for apt/dpkg locks"
+      exit 1
+    fi
+
+    echo "waiting for another package process to finish..."
+    sleep 10
+  done
+
+  "${SUDO[@]}" dpkg --configure -a || true
+}
+
+apt_update() {
+  wait_apt_locks
+  "${SUDO[@]}" apt-get -o DPkg::Lock::Timeout=900 update
+}
+
+apt_install() {
+  wait_apt_locks
+  "${SUDO[@]}" apt-get -o DPkg::Lock::Timeout=900 install -y "$@"
 }
 
 load_generated() {
@@ -49,7 +97,7 @@ if [[ -z "${XUI_USERNAME:-}" || "${XUI_USERNAME}" == "auto" ]]; then
 fi
 
 if [[ -z "${XUI_PASSWORD:-}" || "${XUI_PASSWORD}" == "auto" ]]; then
-  XUI_PASSWORD="${ARCHCTL_XUI_PASSWORD:-$(gen_alnum 24)}"
+  XUI_PASSWORD="${ARCHCTL_XUI_PASSWORD:-$(gen_alnum 20)}"
 fi
 
 if [[ -z "${XUI_WEB_BASE_PATH:-}" || "${XUI_WEB_BASE_PATH}" == "auto" ]]; then
@@ -64,8 +112,9 @@ save_generated
 
 export DEBIAN_FRONTEND=noninteractive
 
-"${SUDO[@]}" apt-get update
-"${SUDO[@]}" apt-get install -y \
+apt_update
+
+apt_install \
   ca-certificates \
   curl \
   wget \
@@ -76,9 +125,9 @@ export DEBIAN_FRONTEND=noninteractive
   iptables \
   iproute2 \
   lsof \
+  psmisc \
   socat \
-  cron \
-  python3
+  cron
 
 echo "== Remove old Docker 3x-ui if present =="
 "${SUDO[@]}" systemctl stop 3x-ui.service 2>/dev/null || true
@@ -107,19 +156,13 @@ if [[ "${need_install}" -eq 1 ]]; then
   curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh -o /tmp/3x-ui-install.sh
   chmod +x /tmp/3x-ui-install.sh
 
-  # Best effort non-interactive setup. If upstream installer changes prompts,
-  # run it manually once, then rerun archctl switch.
   {
     printf '\n'
     printf 'y\n'
     printf '%s\n' "${XUI_PANEL_PORT}"
     printf '4\n'
     printf 'y\n'
-  } | "${SUDO[@]}" bash /tmp/3x-ui-install.sh || {
-    echo "3x-ui installer failed in non-interactive mode."
-    echo "Run manually: sudo bash /tmp/3x-ui-install.sh"
-    exit 1
-  }
+  } | "${SUDO[@]}" bash /tmp/3x-ui-install.sh
 fi
 
 xui_bin="$(command -v x-ui || true)"
