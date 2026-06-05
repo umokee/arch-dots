@@ -9,16 +9,13 @@ mkdir -p "$backup_dir"
 
 items=()
 
-if [[ -d /etc/x-ui ]]; then
-  items+=("etc/x-ui")
-fi
-
-if [[ -d /root/cert ]]; then
-  items+=("root/cert")
-fi
+[[ -d /etc/x-ui ]] && items+=("etc/x-ui")
+[[ -d /root/cert ]] && items+=("root/cert")
+[[ -f /etc/archctl/3x-ui.generated.env ]] && items+=("etc/archctl/3x-ui.generated.env")
+[[ -f /root/3x-ui-access.txt ]] && items+=("root/3x-ui-access.txt")
 
 if [[ "${#items[@]}" -eq 0 ]]; then
-  echo "Nothing to backup: /etc/x-ui and /root/cert not found"
+  echo "Nothing to backup."
   exit 0
 fi
 

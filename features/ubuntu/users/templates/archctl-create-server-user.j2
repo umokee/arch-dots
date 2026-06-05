@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source /etc/archctl/server-user.env
+
+if [[ -z "${SERVER_USER:-}" ]]; then
+  echo "SERVER_USER is empty"
+  exit 1
+fi
+
+if [[ -z "${SERVER_PUBLIC_KEY:-}" || "${SERVER_PUBLIC_KEY}" == "CHANGE_ME_SSH_PUBLIC_KEY" ]]; then
+  echo
+  echo "ERROR: server_user.ssh_public_key is not configured."
+  echo "Put your public key into profiles/ubuntu-xray.toml:"
+  echo "  server_user.ssh_public_key = "$(cat ~/.ssh/server.pub)""
+  echo
+  exit 1
+fi
+
+if ! id "${SERVER_USER}" >/dev/null 2>&1; then
+  useradd -m -s /bin/bash -G sudo "${SERVER_USER}"
+else
+  usermod -aG sudo -s /bin/bash "${SERVER_USER}"
+fi
+
+passwd -l "${SERVER_USER}" >/dev/null 2>&1 || true
+
+home_dir="$(getent passwd "${SERVER_USER}" | cut -d: -f6)"
+if [[ -z "${home_dir}" || ! -d "${home_dir}" ]]; then
+  echo "Cannot resolve home directory for ${SERVER_USER}"
+  exit 1
+fi
+
+install -d -m 700 -o "${SERVER_USER}" -g "${SERVER_USER}" "${home_dir}/.ssh"
+
+authorized_keys="${home_dir}/.ssh/authorized_keys"
+touch "${authorized_keys}"
+chown "${SERVER_USER}:${SERVER_USER}" "${authorized_keys}"
+chmod 600 "${authorized_keys}"
+
+if ! grep -Fxq "${SERVER_PUBLIC_KEY}" "${authorized_keys}"; then
+  printf '%s
+' "${SERVER_PUBLIC_KEY}" >> "${authorized_keys}"
+fi
+
+chown "${SERVER_USER}:${SERVER_USER}" "${authorized_keys}"
+chmod 600 "${authorized_keys}"
+
+visudo -cf /etc/sudoers.d/90-archctl-server-user
+
+echo "Server user ready: ${SERVER_USER}"

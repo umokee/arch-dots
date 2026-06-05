@@ -1,13 +1,59 @@
 hostname = "proxy-01"
-username = "root"
-home = "/root"
+username = "user"
+home = "/home/user"
 machine_type = "server"
 platform = "ubuntu"
 
-features = ["ubuntu.server-base", "ubuntu.ssh-hardening", "services.3x-ui"]
+features = [
+  "ubuntu.server-base",
+  "ubuntu.users",
+  "ubuntu.ssh-hardening",
+  "services.3x-ui",
+  "ubuntu.firewall",
+  "ubuntu.healthcheck",
+]
+
+[server_user]
+name = "user"
+
+# ВАЖНО: замени на вывод команды с твоего ПК:
+#   cat ~/.ssh/server.pub
+ssh_public_key = "CHANGE_ME_SSH_PUBLIC_KEY"
 
 [ssh]
 port = 22
 permit_root_login = "no"
-allow_users = ["admin"]
-allow_tcp_forwarding = "yes"
+allow_users = ["user"]
+
+# Нужно для SSH-туннеля к панели:
+#   ssh -L 2053:127.0.0.1:2053 server
+allow_tcp_forwarding = "local"
+
+[firewall]
+ssh_port = 22
+
+# Открытые наружу proxy-порты.
+# Панель 3x-ui сюда НЕ добавляем.
+proxy_ports = ["443/tcp"]
+
+# Панель слушает 127.0.0.1, поэтому наружу порт 2053 не открывается.
+panel_port = 2053
+
+# Если когда-нибудь захочешь открыть панель только со своего IP:
+# panel_allow_from = ["1.2.3.4"]
+panel_allow_from = []
+
+[xui]
+panel_port = 2053
+
+# auto = сгенерировать один раз и сохранить в /etc/archctl/3x-ui.generated.env
+web_base_path = "auto"
+username = "auto"
+password = "auto"
+
+# Важно: панель доступна только через SSH tunnel.
+listen_ip = "127.0.0.1"
+
+# true = прогонять официальный installer при каждом switch.
+# Обычно лучше false.
+force_update = "false"

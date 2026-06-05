@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source /etc/archctl/firewall.env
+
+if [[ -z "${SSH_PORT:-}" ]]; then
+  echo "SSH_PORT is empty"
+  exit 1
+fi
+
+if ! command -v ufw >/dev/null 2>&1; then
+  echo "ufw is not installed"
+  exit 1
+fi
+
+ufw --force reset
+ufw default deny incoming
+ufw default allow outgoing
+ufw logging low
+
+ufw allow "${SSH_PORT}/tcp" comment "archctl ssh"
+
+for rule in ${PROXY_PORTS:-}; do
+  ufw allow "${rule}" comment "archctl proxy"
+done
+
+for ip in ${PANEL_ALLOW_FROM:-}; do
+  ufw allow from "${ip}" to any port "${PANEL_PORT}" proto tcp comment "archctl 3x-ui panel restricted"
+done
+
+ufw --force enable
+ufw status verbose

@@ -40,7 +40,11 @@ export DEBIAN_FRONTEND=noninteractive
   iputils-ping \
   dnsutils \
   traceroute \
-  tcpdump
+  tcpdump \
+  lsof \
+  sqlite3 \
+  python3 \
+  python-is-python3
 
 "${SUDO[@]}" systemctl enable --now systemd-timesyncd.service || true
 "${SUDO[@]}" systemctl enable --now ssh.service || true

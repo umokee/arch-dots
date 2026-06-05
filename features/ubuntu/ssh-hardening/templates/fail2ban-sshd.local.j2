@@ -1,0 +1,14 @@
+# Managed by archctl
+
+[sshd]
+enabled = true
+backend = systemd
+port = {{ ssh.port }}
+filter = sshd
+maxretry = 3
+findtime = 10m
+bantime = 12h
+bantime.increment = true
+bantime.factor = 2
+bantime.maxtime = 7d
+ignoreip = 127.0.0.1/8 ::1

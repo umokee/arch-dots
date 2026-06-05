@@ -1,0 +1,48 @@
+id = "ubuntu.users"
+description = "Create server sudo user and install SSH public key"
+
+[[dirs]]
+target = "/etc/archctl"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/sudoers.d"
+permissions = "755"
+
+[[dirs]]
+target = "/usr/local/sbin"
+permissions = "755"
+
+[[files]]
+source = "templates/server-user.env.j2"
+target = "/etc/archctl/server-user.env"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "600"
+
+[[files]]
+source = "templates/sudoers-server-user.j2"
+target = "/etc/sudoers.d/90-archctl-server-user"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "440"
+
+[[files]]
+source = "templates/archctl-create-server-user.j2"
+target = "/usr/local/sbin/archctl-create-server-user"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "755"
+
+[[hooks]]
+name = "create-server-user"
+script = "create-server-user.sh"
+run = "post"
+kind = "sync"
+note = "Creates server user and installs SSH authorized_keys."

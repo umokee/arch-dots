@@ -1,0 +1,35 @@
+id = "ubuntu.firewall"
+description = "UFW firewall rules for Ubuntu proxy server"
+
+[[dirs]]
+target = "/etc/archctl"
+permissions = "755"
+
+[[dirs]]
+target = "/usr/local/sbin"
+permissions = "755"
+
+[[files]]
+source = "templates/firewall.env.j2"
+target = "/etc/archctl/firewall.env"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "600"
+
+[[files]]
+source = "templates/archctl-apply-firewall.j2"
+target = "/usr/local/sbin/archctl-apply-firewall"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "755"
+
+[[hooks]]
+name = "apply-firewall"
+script = "apply-firewall.sh"
+run = "post"
+kind = "sync"
+note = "Configures UFW automatically."

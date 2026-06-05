@@ -1,0 +1,35 @@
+id = "ubuntu.ssh-hardening"
+description = "SSH hardening for Ubuntu VPS"
+
+[[dirs]]
+target = "/etc/ssh/sshd_config.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/fail2ban/jail.d"
+permissions = "755"
+
+[[files]]
+source = "templates/sshd-hardening.conf.j2"
+target = "/etc/ssh/sshd_config.d/99-hardening.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/fail2ban-sshd.local.j2"
+target = "/etc/fail2ban/jail.d/sshd.local"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[hooks]]
+name = "reload-ssh"
+script = "reload-ssh.sh"
+run = "post"
+kind = "generator"
+note = "Validates SSH config and reloads SSH/fail2ban."

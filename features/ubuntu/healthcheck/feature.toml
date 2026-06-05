@@ -1,0 +1,9 @@
+id = "ubuntu.healthcheck"
+description = "Post-switch health checks for Ubuntu proxy server"
+
+[[hooks]]
+name = "server-healthcheck"
+script = "server-healthcheck.sh"
+run = "post"
+kind = "generator"
+note = "Checks SSH, UFW, BBR and 3x-ui service."
