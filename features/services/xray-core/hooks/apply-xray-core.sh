@@ -184,9 +184,13 @@ stop_3xui() {
 
 public_from_private() {
   local private_key="$1"
+  local output=""
 
-  xray x25519 -i "${private_key}" |
-    awk -F': ' 'tolower($1) ~ /public key/ {print $2}'
+  output="$(xray x25519 -i "${private_key}" 2>&1 || true)"
+
+  printf '%s\n' "${output}" |
+    sed -nE 's/^[[:space:]]*[Pp]ublic key:[[:space:]]*//p' |
+    tail -n 1
 }
 
 write_links() {
