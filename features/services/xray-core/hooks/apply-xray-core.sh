@@ -160,7 +160,7 @@ install_xray() {
     -o /tmp/xray-install-release.sh
 
   chmod +x /tmp/xray-install-release.sh
-  bash /tmp/xray-install-release.sh install --logrotate
+  bash /tmp/xray-install-release.sh install
 }
 
 stop_3xui() {

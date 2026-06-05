@@ -19,7 +19,7 @@ curl -L \
 
 chmod +x "$install_script"
 
-"${SUDO[@]}" bash "$install_script" install --logrotate
+"${SUDO[@]}" bash "$install_script" install
 
 "${SUDO[@]}" mkdir -p /usr/local/etc/xray /var/log/xray
 "${SUDO[@]}" chmod 755 /usr/local/etc/xray
