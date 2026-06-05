@@ -24,8 +24,3 @@ script = "apply-xray-core.sh"
 run = "post"
 kind = "sync"
 note = "Installs Xray-core, disables 3x-ui, generates config.json and client link."
-
-[[systemd.system]]
-unit = "xray.service"
-enable = true
-start = true
