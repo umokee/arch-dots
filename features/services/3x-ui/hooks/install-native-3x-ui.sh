@@ -12,7 +12,10 @@ generated_file="/etc/archctl/3x-ui.generated.env"
 
 gen_alnum() {
   local length="$1"
-  tr -dc 'A-Za-z0-9' </dev/urandom | head -c "${length}"
+  local raw=""
+
+  raw="$(openssl rand -hex "$((length + 8))")"
+  printf '%s' "${raw:0:length}"
 }
 
 wait_apt_locks() {
