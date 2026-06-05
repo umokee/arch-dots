@@ -109,3 +109,7 @@ apt_install \
 
 "${SUDO[@]}" sysctl --system || true
 "${SUDO[@]}" systemctl restart systemd-journald.service || true
+
+"${SUDO[@]}" systemctl stop apt-daily.service apt-daily-upgrade.service apt-daily.timer apt-daily-upgrade.timer unattended-upgrades.service 2>/dev/null || true
+"${SUDO[@]}" systemctl disable apt-daily.timer apt-daily-upgrade.timer unattended-upgrades.service 2>/dev/null || true
+"${SUDO[@]}" systemctl mask apt-daily.service apt-daily-upgrade.service apt-daily.timer apt-daily-upgrade.timer 2>/dev/null || true
