@@ -8,7 +8,7 @@ features = [
   "ubuntu.server-base",
   "ubuntu.users",
   "ubuntu.ssh-hardening",
-  "services.3x-ui",
+  "services.xray-core",
   "ubuntu.firewall",
   "ubuntu.healthcheck",
 ]
@@ -16,8 +16,6 @@ features = [
 [server_user]
 name = "user"
 
-# ВАЖНО: замени на вывод команды с твоего ПК:
-#   cat ~/.ssh/server.pub
 ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8OqzrbBUQOTEw84XyUWRjMa21jEwm4pbqsemXD0oWX user@archlinux"
 
 [ssh]
@@ -25,8 +23,6 @@ port = 22
 permit_root_login = "no"
 allow_users = ["user"]
 
-# Нужно для SSH-туннеля к панели:
-#   ssh -L 2053:127.0.0.1:2053 server
 allow_tcp_forwarding = "local"
 
 [firewall]
@@ -56,4 +52,35 @@ listen_ip = "127.0.0.1"
 
 # true = прогонять официальный installer при каждом switch.
 # Обычно лучше false.
+force_update = "false"
+
+[xray]
+public_host = "5.181.202.37"
+
+port = 443
+listen = "0.0.0.0"
+
+# Для REALITY.
+sni = "www.nvidia.com"
+target = "www.nvidia.com:443"
+
+# auto = сгенерировать один раз и сохранить в /etc/archctl/xray-core.generated.env
+uuid = "auto"
+private_key = "auto"
+short_id = "auto"
+xhttp_path = "auto"
+
+# XHTTP.
+xhttp_mode = "packet-up"
+
+# Без xtls-rprx-vision. Для XHTTP flow не нужен.
+fingerprint = "chrome"
+
+# Чтобы меньше ловить странности с IPv6.
+dns_strategy = "UseIPv4"
+
+client_name = "Arch-XHTTP-Reality"
+
+# true = переустановить/обновить xray через официальный installer при каждом switch.
+# Обычно false.
 force_update = "false"

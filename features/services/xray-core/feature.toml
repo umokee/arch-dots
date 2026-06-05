@@ -1,0 +1,38 @@
+id = "services.xray-core"
+description = "Native Xray-core with declarative VLESS + REALITY + XHTTP config"
+
+[[dirs]]
+target = "/etc/archctl"
+permissions = "755"
+
+[[dirs]]
+target = "/usr/local/etc/xray"
+permissions = "755"
+
+[[files]]
+source = "templates/xray-core.env.j2"
+target = "/etc/archctl/xray-core.env"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "600"
+
+[[hooks]]
+name = "apply-xray-core"
+script = "apply-xray-core.sh"
+run = "post"
+kind = "sync"
+note = "Installs Xray-core, disables 3x-ui, generates config.json and client link."
+
+[[hooks]]
+name = "cleanup-xray-core"
+script = "cleanup-xray-core.sh"
+run = "cleanup"
+kind = "cleanup"
+note = "Stops native Xray service when feature is disabled."
+
+[[systemd.system]]
+unit = "xray.service"
+enable = true
+start = true
