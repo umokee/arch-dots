@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SUDO=(sudo)
-if [[ ${EUID} -eq 0 ]]; then
-  SUDO=()
+if [[ "${EUID}" -ne 0 ]]; then
+  exec sudo -E bash "$0" "$@"
 fi
 
 export DEBIAN_FRONTEND=noninteractive
@@ -13,7 +12,7 @@ generated_file="/etc/archctl/xray-core.generated.env"
 config_file="/usr/local/etc/xray/config.json"
 links_file="/root/xray-client-links.txt"
 
-if [[ ! -f ${env_file} ]]; then
+if [[ ! -f "${env_file}" ]]; then
   echo "Missing ${env_file}"
   exit 1
 fi
@@ -21,34 +20,48 @@ fi
 # shellcheck disable=SC1090
 source "${env_file}"
 
-if [[ -f ${generated_file} ]]; then
+if [[ -f "${generated_file}" ]]; then
   # shellcheck disable=SC1090
   source "${generated_file}"
 fi
 
+XRAY_PUBLIC_HOST="${XRAY_PUBLIC_HOST:?XRAY_PUBLIC_HOST is required}"
+XRAY_PORT="${XRAY_PORT:-443}"
+XRAY_LISTEN="${XRAY_LISTEN:-0.0.0.0}"
+
+XRAY_SNI="${XRAY_SNI:-www.nvidia.com}"
+XRAY_TARGET="${XRAY_TARGET:-www.nvidia.com:443}"
+
+XRAY_UUID="${XRAY_UUID:-auto}"
+XRAY_PRIVATE_KEY="${XRAY_PRIVATE_KEY:-auto}"
+XRAY_SHORT_ID="${XRAY_SHORT_ID:-auto}"
+XRAY_XHTTP_PATH="${XRAY_XHTTP_PATH:-auto}"
+
+XRAY_XHTTP_MODE="${XRAY_XHTTP_MODE:-packet-up}"
+XRAY_FINGERPRINT="${XRAY_FINGERPRINT:-chrome}"
+XRAY_DNS_STRATEGY="${XRAY_DNS_STRATEGY:-UseIPv4}"
+XRAY_CLIENT_NAME="${XRAY_CLIENT_NAME:-Arch-XHTTP-Reality}"
+XRAY_FORCE_UPDATE="${XRAY_FORCE_UPDATE:-false}"
+
 bool_true() {
   case "${1,,}" in
-  1 | true | yes | on)
-    return 0
-    ;;
-  *)
-    return 1
-    ;;
+    1|true|yes|on) return 0 ;;
+    *) return 1 ;;
   esac
 }
 
 wait_apt_locks() {
   local waited=0
 
-  while
-    pgrep -x apt > /dev/null 2>&1 ||
-      pgrep -x apt-get > /dev/null 2>&1 ||
-      pgrep -x dpkg > /dev/null 2>&1 ||
-      pgrep -x unattended-upgr > /dev/null 2>&1
+  while \
+    pgrep -x apt >/dev/null 2>&1 || \
+    pgrep -x apt-get >/dev/null 2>&1 || \
+    pgrep -x dpkg >/dev/null 2>&1 || \
+    pgrep -x unattended-upgr >/dev/null 2>&1
   do
     waited=$((waited + 10))
 
-    if [[ ${waited} -gt 1800 ]]; then
+    if [[ "${waited}" -gt 1800 ]]; then
       echo "Timed out waiting for apt/dpkg process"
       exit 1
     fi
@@ -57,17 +70,17 @@ wait_apt_locks() {
     sleep 10
   done
 
-  "${SUDO[@]}" dpkg --configure -a || true
+  dpkg --configure -a || true
 }
 
 apt_update() {
   wait_apt_locks
-  "${SUDO[@]}" apt-get -o DPkg::Lock::Timeout=900 update
+  apt-get -o DPkg::Lock::Timeout=900 update
 }
 
 apt_install() {
   wait_apt_locks
-  "${SUDO[@]}" apt-get -o DPkg::Lock::Timeout=900 install -y "$@"
+  apt-get -o DPkg::Lock::Timeout=900 install -y "$@"
 }
 
 install_deps() {
@@ -82,7 +95,7 @@ install_deps() {
 install_xray() {
   local need_install=0
 
-  if ! command -v xray > /dev/null 2>&1; then
+  if ! command -v xray >/dev/null 2>&1; then
     need_install=1
   fi
 
@@ -90,35 +103,36 @@ install_xray() {
     need_install=1
   fi
 
-  if [[ ${need_install} -eq 0 ]]; then
+  if [[ "${need_install}" -eq 0 ]]; then
     echo "Xray is already installed"
     return 0
   fi
 
-  echo "Installing/updating Xray-core via official XTLS installer"
+  echo "Installing/updating Xray-core"
 
   curl -fsSL \
     https://github.com/XTLS/Xray-install/raw/main/install-release.sh \
     -o /tmp/xray-install-release.sh
 
   chmod +x /tmp/xray-install-release.sh
-
-  "${SUDO[@]}" bash /tmp/xray-install-release.sh install
+  bash /tmp/xray-install-release.sh install --logrotate
 }
 
 stop_3xui() {
   echo "Stopping old 3x-ui/x-ui if present"
 
-  "${SUDO[@]}" systemctl disable --now x-ui.service 2> /dev/null || true
-  "${SUDO[@]}" systemctl disable --now 3x-ui.service 2> /dev/null || true
+  systemctl disable --now x-ui.service 2>/dev/null || true
+  systemctl disable --now 3x-ui.service 2>/dev/null || true
 
-  if command -v docker > /dev/null 2>&1; then
-    "${SUDO[@]}" docker rm -f 3xui_app 2> /dev/null || true
+  if command -v docker >/dev/null 2>&1; then
+    docker rm -f 3xui_app 2>/dev/null || true
+    docker rm -f 3x-ui 2>/dev/null || true
+    docker rm -f x-ui 2>/dev/null || true
   fi
 }
 
 need_auto() {
-  [[ ${1} == "auto" || -z ${1} ]]
+  [[ "${1}" == "auto" || -z "${1}" ]]
 }
 
 generate_uuid() {
@@ -151,7 +165,7 @@ prepare_state() {
 
   if need_auto "${actual_uuid}"; then
     actual_uuid="${XRAY_GENERATED_UUID:-}"
-    if [[ -z ${actual_uuid} ]]; then
+    if [[ -z "${actual_uuid}" ]]; then
       actual_uuid="$(generate_uuid)"
     fi
   fi
@@ -160,7 +174,7 @@ prepare_state() {
     actual_private_key="${XRAY_GENERATED_PRIVATE_KEY:-}"
     actual_public_key="${XRAY_GENERATED_PUBLIC_KEY:-}"
 
-    if [[ -z ${actual_private_key} || -z ${actual_public_key} ]]; then
+    if [[ -z "${actual_private_key}" || -z "${actual_public_key}" ]]; then
       pair="$(generate_x25519_pair)"
       actual_private_key="$(printf '%s\n' "${pair}" | awk -F': ' '/Private key/ {print $2}')"
       actual_public_key="$(printf '%s\n' "${pair}" | awk -F': ' '/Public key/ {print $2}')"
@@ -171,40 +185,25 @@ prepare_state() {
 
   if need_auto "${actual_short_id}"; then
     actual_short_id="${XRAY_GENERATED_SHORT_ID:-}"
-    if [[ -z ${actual_short_id} ]]; then
+    if [[ -z "${actual_short_id}" ]]; then
       actual_short_id="$(generate_short_id)"
     fi
   fi
 
   if need_auto "${actual_xhttp_path}"; then
     actual_xhttp_path="${XRAY_GENERATED_XHTTP_PATH:-}"
-    if [[ -z ${actual_xhttp_path} ]]; then
+    if [[ -z "${actual_xhttp_path}" ]]; then
       actual_xhttp_path="$(generate_xhttp_path)"
     fi
   fi
 
-  if [[ -z ${actual_uuid} ]]; then
-    echo "Failed to generate UUID"
-    exit 1
-  fi
-
-  if [[ -z ${actual_private_key} || -z ${actual_public_key} ]]; then
-    echo "Failed to generate X25519 key pair"
-    exit 1
-  fi
-
-  if [[ -z ${actual_short_id} ]]; then
-    echo "Failed to generate short_id"
-    exit 1
-  fi
-
-  if [[ ${actual_xhttp_path} != /* ]]; then
+  if [[ "${actual_xhttp_path}" != /* ]]; then
     actual_xhttp_path="/${actual_xhttp_path}"
   fi
 
   tmp_generated="$(mktemp)"
 
-  cat > "${tmp_generated}" << EOF
+  cat > "${tmp_generated}" <<EOF
 XRAY_GENERATED_UUID='${actual_uuid}'
 XRAY_GENERATED_PRIVATE_KEY='${actual_private_key}'
 XRAY_GENERATED_PUBLIC_KEY='${actual_public_key}'
@@ -212,19 +211,22 @@ XRAY_GENERATED_SHORT_ID='${actual_short_id}'
 XRAY_GENERATED_XHTTP_PATH='${actual_xhttp_path}'
 EOF
 
-  "${SUDO[@]}" install -m 600 -o root -g root "${tmp_generated}" "${generated_file}"
+  install -m 600 -o root -g root "${tmp_generated}" "${generated_file}"
   rm -f "${tmp_generated}"
 }
 
 write_config() {
-  "${SUDO[@]}" install -d -m 755 /usr/local/etc/xray
+  install -d -m 755 /usr/local/etc/xray
+  install -d -m 755 /var/log/xray
 
   tmp_config="$(mktemp)"
 
-  cat > "${tmp_config}" << EOF
+  cat > "${tmp_config}" <<EOF
 {
   "log": {
-    "loglevel": "warning"
+    "loglevel": "warning",
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log"
   },
   "dns": {
     "queryStrategy": "${XRAY_DNS_STRATEGY}",
@@ -306,9 +308,9 @@ write_config() {
 EOF
 
   echo "Testing Xray config"
-  "${SUDO[@]}" xray run -test -config "${tmp_config}"
+  xray run -test -config "${tmp_config}"
 
-  "${SUDO[@]}" install -m 644 -o root -g root "${tmp_config}" "${config_file}"
+  install -m 644 -o root -g root "${tmp_config}" "${config_file}"
   rm -f "${tmp_config}"
 }
 
@@ -319,7 +321,7 @@ write_links() {
 
   tmp_links="$(mktemp)"
 
-  cat > "${tmp_links}" << EOF
+  cat > "${tmp_links}" <<EOF
 Xray VLESS + REALITY + XHTTP
 
 Server:
@@ -343,6 +345,7 @@ Manual client fields:
   public key: ${actual_public_key}
   short id: ${actual_short_id}
   flow: empty / none
+  mux: disabled
 
 Server config:
   ${config_file}
@@ -351,22 +354,22 @@ Generated state:
   ${generated_file}
 EOF
 
-  "${SUDO[@]}" install -m 600 -o root -g root "${tmp_links}" "${links_file}"
+  install -m 600 -o root -g root "${tmp_links}" "${links_file}"
   rm -f "${tmp_links}"
 }
 
 restart_xray() {
-  "${SUDO[@]}" systemctl daemon-reload
-  "${SUDO[@]}" systemctl enable xray.service
-  "${SUDO[@]}" systemctl restart xray.service
+  systemctl daemon-reload
+  systemctl enable xray.service
+  systemctl restart xray.service
 
   echo
   echo "Xray status:"
-  "${SUDO[@]}" systemctl --no-pager --full status xray.service || true
+  systemctl --no-pager --full status xray.service || true
 
   echo
   echo "Listening ports:"
-  "${SUDO[@]}" ss -tulpn | grep -E "xray|:${XRAY_PORT}" || true
+  ss -tulpn | grep -E "xray|:${XRAY_PORT}" || true
 }
 
 main() {
