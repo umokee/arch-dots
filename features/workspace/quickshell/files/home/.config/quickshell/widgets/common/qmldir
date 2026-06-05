@@ -1,0 +1,7 @@
+module Common
+
+Panel 1.0 Panel.qml
+Divider 1.0 Divider.qml
+IconButton 1.0 IconButton.qml
+PopupSurface 1.0 PopupSurface.qml
+TextIcon 1.0 TextIcon.qml

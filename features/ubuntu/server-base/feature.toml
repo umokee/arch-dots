@@ -1,0 +1,48 @@
+id = "ubuntu.server-base"
+description = "Minimal Ubuntu server base for proxy/Xray VPS"
+
+[[dirs]]
+target = "/etc/sysctl.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/systemd/journald.conf.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/apt/apt.conf.d"
+permissions = "755"
+
+[[files]]
+source = "templates/sysctl-proxy.j2"
+target = "/etc/sysctl.d/80-proxy-network.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/journald-proxy.j2"
+target = "/etc/systemd/journald.conf.d/90-proxy.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/unattended-upgrades.j2"
+target = "/etc/apt/apt.conf.d/20auto-upgrades"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[hooks]]
+name = "apt-base"
+script = "apt-base.sh"
+run = "pre"
+kind = "sync"
+note = "Installs minimal Ubuntu server packages."

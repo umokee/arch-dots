@@ -1,35 +1,14 @@
-[Unit]
-Description=Xray Client
-After=network-online.target
-Wants=network-online.target
+# Managed by archctl
 
 [Service]
-Type=simple
-Environment=XRAY_LOCATION_ASSET=/etc/xray
+Restart=always
+RestartSec=3
 
-ExecStartPre=/usr/bin/xray -test -c /etc/xray/config.json
-ExecStart=/usr/bin/xray run -c /etc/xray/config.json
+LimitNOFILE=1048576
+LimitNPROC=65535
 
-Restart=on-failure
-RestartSec=5
-
-StandardOutput=journal
-StandardError=journal
-
-KillSignal=SIGTERM
-TimeoutStopSec=30s
-KillMode=mixed
-
-AmbientCapabilities=CAP_NET_BIND_SERVICE
-CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 NoNewPrivileges=true
-
-StateDirectory=xray
-WorkingDirectory=/var/lib/xray
-
-MemoryMax=128M
-CPUQuota=100%
-Nice=-10
-
-[Install]
-WantedBy=multi-user.target
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/usr/local/etc/xray /var/log/xray

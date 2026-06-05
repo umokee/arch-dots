@@ -7,6 +7,7 @@ fallback_kernel = true
 features = [
   "base.boot",
   "base.system",
+  "base.users",
   "base.security",
   "base.locale",
   "base.network",
@@ -26,7 +27,6 @@ features = [
   "workspace.display-manager",
   "workspace.quickshell",
   "workspace.tofi",
-  "workspace.dunst",
   "workspace.xdg",
   "workspace.themes",
   "workspace.wallpapers",
@@ -72,8 +72,8 @@ manage_pacman_conf = false
 sops_age_key = "/etc/key.txt"
 
 [ignore]
-pacman = ["yay"]
-foreign = ["yay", "decman", "aconfmgr-git"]
+pacman = []
+foreign = ["yay", "vortex-linux-fix"]
 
 [prune]
 protected = []

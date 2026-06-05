@@ -1,0 +1,3 @@
+module OverviewWidgets
+
+WorkspaceCard 1.0 WorkspaceCard.qml

@@ -5,9 +5,64 @@ log() {
   printf '[arch-autostart-apps] %s\n' "$*" >&2
 }
 
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+export XDG_SESSION_TYPE="${XDG_SESSION_TYPE:-wayland}"
+export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-Hyprland}"
+export XDG_SESSION_DESKTOP="${XDG_SESSION_DESKTOP:-Hyprland}"
+
+# Формат:
+# process|workspace|delay_after|command1;command2;command3
+# workspace только для логов
+AUTOSTART_APPS=(
+  "zen-browser|1|0.4|zen-browser;zen;firefox"
+  "steam|5|0.4|steam"
+  "telegram-desktop|10|0.4|telegram-desktop;Telegram"
+  "spotify|9|0.0|spotify"
+)
+
+detect_wayland_display() {
+  if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
+    return 0
+  fi
+
+  local sock
+  for sock in "$XDG_RUNTIME_DIR"/wayland-*; do
+    if [[ -S "$sock" ]]; then
+      export WAYLAND_DISPLAY="${sock##*/}"
+      log "detected WAYLAND_DISPLAY=$WAYLAND_DISPLAY"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+detect_hyprland_instance() {
+  if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+    return 0
+  fi
+
+  local dir
+  for dir in "$XDG_RUNTIME_DIR"/hypr/*; do
+    if [[ -S "$dir/.socket.sock" ]]; then
+      export HYPRLAND_INSTANCE_SIGNATURE="${dir##*/}"
+      log "detected HYPRLAND_INSTANCE_SIGNATURE=$HYPRLAND_INSTANCE_SIGNATURE"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 wait_hyprland() {
-  for _ in $(seq 1 100); do
+  local i
+
+  for i in $(seq 1 100); do
+    detect_wayland_display || true
+    detect_hyprland_instance || true
+
     if hyprctl monitors >/dev/null 2>&1; then
+      log "Hyprland is ready"
       return 0
     fi
 
@@ -18,88 +73,102 @@ wait_hyprland() {
   return 1
 }
 
-command_exists() {
-  command -v "$1" >/dev/null 2>&1
+command_exists_for_candidate() {
+  local candidate="$1"
+  local binary="${candidate%% *}"
+
+  command -v "$binary" >/dev/null 2>&1
 }
 
 process_exists() {
   local name="$1"
-  pgrep -x "$name" >/dev/null 2>&1
+
+  if pgrep -u "$USER" -x "$name" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if pgrep -u "$USER" -f "$name" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  return 1
 }
 
 dispatch_exec() {
   local workspace="$1"
   local command="$2"
 
-  log "workspace ${workspace}: ${command}"
-  hyprctl dispatch exec "[workspace ${workspace} silent] ${command}" >/dev/null 2>&1 || true
+  log "launch workspace=${workspace}: ${command}"
+
+  nohup bash -lc "$command" >/dev/null 2>&1 </dev/null &
+
+  log "started: ${command}"
 }
 
-run_once() {
-  local process_name="$1"
-  local workspace="$2"
-  local command="$3"
+run_app_entry() {
+  local entry="$1"
+  local process_name
+  local workspace
+  local delay_after
+  local candidates_raw
 
-  if process_exists "$process_name"; then
-    log "skip ${process_name}: already running"
+  IFS='|' read -r process_name workspace delay_after candidates_raw <<< "$entry"
+
+  if [[ -z "${process_name:-}" || -z "${candidates_raw:-}" ]]; then
+    log "skip broken entry: $entry"
     return 0
   fi
 
-  dispatch_exec "$workspace" "$command"
-}
-
-run_first_available_once() {
-  local process_name="$1"
-  local workspace="$2"
-  shift 2
-
   if process_exists "$process_name"; then
     log "skip ${process_name}: already running"
+    sleep "${delay_after:-0}"
     return 0
   fi
 
-  for candidate in "$@"; do
-    local binary="${candidate%% *}"
+  local candidate
+  local started=0
 
-    if command_exists "$binary"; then
-      dispatch_exec "$workspace" "$candidate"
-      return 0
+  IFS=';' read -ra candidates <<< "$candidates_raw"
+
+  for candidate in "${candidates[@]}"; do
+    candidate="${candidate#"${candidate%%[![:space:]]*}"}"
+    candidate="${candidate%"${candidate##*[![:space:]]}"}"
+
+    [[ -z "$candidate" ]] && continue
+
+    if ! command_exists_for_candidate "$candidate"; then
+      log "candidate unavailable for ${process_name}: ${candidate}"
+      continue
+    fi
+
+    if dispatch_exec "$workspace" "$candidate"; then
+      started=1
+      break
     fi
   done
 
-  log "skip ${process_name}: no command found"
+  if [[ "$started" -ne 1 ]]; then
+    log "skip ${process_name}: no candidate started"
+  fi
+
+  sleep "${delay_after:-0}"
 }
 
 wait_hyprland
 
-# Даём kanshi/quickshell/swaybg немного времени.
+log "environment:"
+log "  XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR"
+log "  WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-}"
+log "  HYPRLAND_INSTANCE_SIGNATURE=${HYPRLAND_INSTANCE_SIGNATURE:-}"
+log "  PATH=$PATH"
+
 sleep 1
 
-# Старые DPI/GTK-настройки из Nix-конфига.
 echo 'Xft.dpi: 125' | xrdb -merge >/dev/null 2>&1 || true
 gsettings set org.gnome.desktop.interface text-scaling-factor 1.25 >/dev/null 2>&1 || true
 
-# Обычный автозапуск.
-# Здесь workspace задаётся через Hyprland exec rule, поэтому окна попадают туда
-# даже если windowrule сработает позже или класс окна появится не сразу.
-
-run_first_available_once "zen-browser" "1" \
-  "zen-browser" \
-  "zen" \
-  "firefox"
-
-sleep 0.4
-
-run_once "steam" "5" "steam"
-
-sleep 0.4
-
-run_first_available_once "telegram-desktop" "10" \
-  "telegram-desktop" \
-  "Telegram"
-
-sleep 0.4
-
-run_once "spotify" "9" "spotify"
+for entry in "${AUTOSTART_APPS[@]}"; do
+  run_app_entry "$entry"
+done
 
 log "done"

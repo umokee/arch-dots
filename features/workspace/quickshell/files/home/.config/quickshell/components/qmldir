@@ -1,6 +1,0 @@
-module Components
-
-Divider 1.0 Divider.qml
-Clock 1.0 Clock.qml
-Workspaces 1.0 Workspaces.qml
-StatusIndicators 1.0 StatusIndicators.qml

@@ -1,10 +1,10 @@
 [Unit]
-Description=Create main user if missing
+Description=Create and configure main user
 After=local-fs.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/bash -lc 'id {{ username }} >/dev/null 2>&1 || useradd -m -G {{ user.groups | join(',') }} -s {{ user.shell }} {{ username }}; usermod -aG {{ user.groups | join(',') }} {{ username }} || true'
+ExecStart=/usr/bin/bash -lc 'id {{ username }} >/dev/null 2>&1 || useradd -m -G {{ user.groups | join(',') }} -s {{ user.shell }} {{ username }}; usermod -aG {{ user.groups | join(',') }} -s {{ user.shell }} {{ username }} || true'
 RemainAfterExit=yes
 
 [Install]

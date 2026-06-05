@@ -4,7 +4,6 @@
   "window.zoomLevel": 1,
 
   "workbench.iconTheme": "bearded-icons",
-  "workbench.colorTheme": "Dark Lavender",
 
   //"http.proxy": "http://127.0.0.1:2090",
   //"http.proxyStrictSSL": false,
@@ -13,7 +12,7 @@
   "editor.formatOnPaste": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
-    "source.organizeImports": "explicit"
+    "source.organizeImports": "explicit",
   },
 
   "problems.showCurrentInStatus": true,
@@ -125,15 +124,15 @@
     "**/*.pyo": true,
     "**/*.pyd": true,
     "**/*.log": true,
-    "**/*.map": true
+    "**/*.map": true,
   },
 
   "[lua]": {
     "editor.tabSize": 2,
     "editor.defaultFormatter": "JohnnyMorganz.stylua",
     "editor.codeActionsOnSave": {
-      "source.fixAll": "explicit"
-    }
+      "source.fixAll": "explicit",
+    },
   },
   "Lua.runtime.version": "LuaJIT",
   "Lua.diagnostics.globals": ["vim", "describe", "it", "before_each", "after_each"],
@@ -150,7 +149,7 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "jnoortheen.nix-ide",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "nix.enableLanguageServer": true,
   "nix.serverPath": "nil",
@@ -164,8 +163,8 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll.ruff": "explicit",
-      "source.organizeImports.ruff": "explicit"
-    }
+      "source.organizeImports.ruff": "explicit",
+    },
   },
   "python.languageServer": "Pylance",
   "python.analysis.userFileIndexingLimit": -1,
@@ -174,7 +173,7 @@
   "python.analysis.typeCheckingMode": "off",
   "python.analysis.diagnosticMode": "workspace",
   "python.analysis.diagnosticSeverityOverrides": {
-    "reportCallInDefaultInitializer": "none"
+    "reportCallInDefaultInitializer": "none",
   },
   "python.analysis.autoImportCompletions": true,
   "python.analysis.indexing": true,
@@ -183,8 +182,8 @@
     {
       "name": "",
       "depth": 5,
-      "includeAllSymbols": true
-    }
+      "includeAllSymbols": true,
+    },
   ],
 
   "[typescript]": {
@@ -195,8 +194,8 @@
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit",
       "source.organizeImports": "explicit",
-      "source.removeUnusedImports": "explicit"
-    }
+      "source.removeUnusedImports": "explicit",
+    },
   },
   "[javascript]": {
     "editor.tabSize": 2,
@@ -205,8 +204,8 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit",
-      "source.organizeImports": "explicit"
-    }
+      "source.organizeImports": "explicit",
+    },
   },
   "[typescriptreact]": {
     "editor.tabSize": 2,
@@ -216,8 +215,8 @@
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit",
       "source.organizeImports": "explicit",
-      "source.removeUnusedImports": "explicit"
-    }
+      "source.removeUnusedImports": "explicit",
+    },
   },
   "[javascriptreact]": {
     "editor.tabSize": 2,
@@ -225,8 +224,8 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    }
+      "source.fixAll.eslint": "explicit",
+    },
   },
   "typescript.updateImportsOnFileMove.enabled": "always",
   "typescript.preferences.importModuleSpecifier": "shortest",
@@ -240,8 +239,8 @@
     "editor.defaultFormatter": "Vue.volar",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    }
+      "source.fixAll.eslint": "explicit",
+    },
   },
   "vue.inlayHints.inlineHandlerLeading": true,
   "vue.inlayHints.missingProps": true,
@@ -251,7 +250,7 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "mads-hartmann.bash-ide-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "bashIde.shfmt.spaceRedirects": true,
   "bashIde.shfmt.simplifyCode": true,
@@ -260,7 +259,7 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "redhat.vscode-yaml",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "yaml.validate": true,
   "yaml.hover": true,
@@ -272,32 +271,32 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "[jsonc]": {
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
 
   "[html]": {
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "[css]": {
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "[scss]": {
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
 
   "[markdown]": {
@@ -309,20 +308,20 @@
     "editor.quickSuggestions": {
       "other": "off",
       "comments": "off",
-      "strings": "off"
-    }
+      "strings": "off",
+    },
   },
 
   "[dockerfile]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-docker",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
 
   "[qml]": {
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "theqtcompany.qt-qml",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
 
   "auto-close-tag.enableAutoCloseSelfClosingTag": true,
@@ -336,97 +335,98 @@
   "vim.insertModeKeyBindings": [
     {
       "before": ["j", "j"],
-      "after": ["<Esc>"]
-    }
+      "after": ["<Esc>"],
+    },
   ],
   "vim.normalModeKeyBindingsNonRecursive": [
     {
       "before": ["<leader>", "w"],
-      "commands": ["workbench.action.files.save"]
+      "commands": ["workbench.action.files.save"],
     },
     {
       "before": ["<C-n>"],
-      "commands": [":nohl"]
+      "commands": [":nohl"],
     },
     {
       "before": ["K"],
       "commands": ["lineBreakInsert"],
-      "silent": true
+      "silent": true,
     },
     {
       "before": ["[", "m"],
       "commands": [
         {
           "command": "gotoNextPreviousMember.previousMember",
-          "args": ["function", "method", "class"]
-        }
-      ]
+          "args": ["function", "method", "class"],
+        },
+      ],
     },
     {
       "before": ["]", "m"],
       "commands": [
         {
           "command": "gotoNextPreviousMember.nextMember",
-          "args": ["function", "method", "class"]
-        }
-      ]
+          "args": ["function", "method", "class"],
+        },
+      ],
     },
     {
       "before": ["g", "d"],
-      "commands": ["editor.action.revealDefinition"]
+      "commands": ["editor.action.revealDefinition"],
     },
     {
       "before": ["g", "D"],
-      "commands": ["editor.action.peekDefinition"]
+      "commands": ["editor.action.peekDefinition"],
     },
     {
       "before": ["g", "r"],
-      "commands": ["editor.action.goToReferences"]
+      "commands": ["editor.action.goToReferences"],
     },
     {
       "before": ["<leader>", "f", "f"],
-      "commands": ["workbench.action.quickOpen"]
+      "commands": ["workbench.action.quickOpen"],
     },
     {
       "before": ["<leader>", "f", "g"],
-      "commands": ["workbench.view.search"]
+      "commands": ["workbench.view.search"],
     },
     {
       "before": ["<leader>", "n", "f"],
-      "commands": ["fileutils.newFileAtRoot"]
+      "commands": ["fileutils.newFileAtRoot"],
     },
     {
       "before": ["<leader>", "n", "d"],
-      "commands": ["fileutils.newFolderAtRoot"]
+      "commands": ["fileutils.newFolderAtRoot"],
     },
     {
       "before": ["<leader>", "r", "n"],
-      "commands": ["fileutils.renameFile"]
+      "commands": ["fileutils.renameFile"],
     },
     {
       "before": ["<leader>", "d", "f"],
-      "commands": ["fileutils.removeFile"]
+      "commands": ["fileutils.removeFile"],
     },
     {
       "before": ["<leader>", "c", "p"],
-      "commands": ["fileutils.copyFileName"]
+      "commands": ["fileutils.copyFileName"],
     },
     {
       "before": ["<leader>", "c", "r"],
-      "commands": ["fileutils.copyRelativeFilePath"]
+      "commands": ["fileutils.copyRelativeFilePath"],
     },
     {
       "before": ["<leader>", "r", "a"],
-      "commands": ["editor.action.changeAll"]
-    }
+      "commands": ["editor.action.changeAll"],
+    },
   ],
   "vim.leader": "<space>",
   "vim.handleKeys": {
     "<C-a>": false,
-    "<C-f>": false
+    "<C-f>": false,
   },
   "extensions.experimental.affinity": {
-    "vscodevim.vim": 1
+    "vscodevim.vim": 1,
+    "asvetliakov.vscode-neovim": 1,
   },
 
   "gotoNextPreviousMember.symbolKinds": ["class", "function", "method", "constructor"],
@@ -473,7 +473,7 @@
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
     ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
     ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
-    ["twMerge\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+    ["twMerge\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
   ],
   "tailwindCSS.classAttributes": ["class", "className", "classList", "ngClass", "tw"],
   "tailwindCSS.suggestions": true,
@@ -483,7 +483,7 @@
 
   "markdownlint.config": {
     "MD013": false,
-    "MD033": false
+    "MD033": false,
   },
 
   "qt-qml.qmlls.enabled": true,
@@ -494,5 +494,16 @@
   "qt-qml.qmlls.checkForQmllsUpdate": false,
   "qt-qml.qmlls.buildDirectory": ".",
 
-  "codeium.enableCodeLens": false
+  "codeium.enableCodeLens": false,
+  "workbench.editorAssociations": {
+    "{git,gitlens,chat-editing-snapshot-text-model,copilot,git-graph,git-graph-3}:/**/*.qrc": "default",
+    "*.qrc": "qt-core.qrcEditor",
+  },
+  "qt-core.additionalQtPaths": [
+    {
+      "name": "Qt-5.15.19-linux-g++-x86_64_from_PATH",
+      "path": "/usr/sbin/qmake",
+    },
+  ],
+  "workbench.colorTheme": "Dark Lavender",
 }

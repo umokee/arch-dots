@@ -4,9 +4,11 @@ import os
 import subprocess
 from pathlib import Path
 
+from arch_config.ui import print_command
+
 
 def run(cmd: list[str], *, dry_run: bool = False, cwd: Path | None = None) -> None:
-    print("+ " + " ".join(cmd))
+    print_command(cmd)
     if dry_run:
         return
     subprocess.run(cmd, check=True, cwd=str(cwd) if cwd else None)

@@ -1,30 +1,39 @@
 id = "services.xray"
-description = "Migrated feature services.xray"
-
-[packages]
-pacman = ["curl"]
-aur = ["xray-bin"]
+description = "Xray-core server with VLESS REALITY config"
 
 [[dirs]]
-target = "/etc/xray"
+target = "/usr/local/etc/xray"
 permissions = "755"
 
 [[dirs]]
-target = "/etc/systemd/system"
+target = "/etc/systemd/system/xray.service.d"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/logrotate.d"
 permissions = "755"
 
 [[files]]
-source = "templates/xray-config.j2"
-target = "/etc/xray/config.json"
+source = "templates/config.json.j2"
+target = "/usr/local/etc/xray/config.json"
 mode = "template"
 type = "file"
 owner = "root"
-group = "wheel"
-permissions = "440"
+group = "root"
+permissions = "600"
 
 [[files]]
-source = "templates/xray-service.j2"
-target = "/etc/systemd/system/xray.service"
+source = "templates/systemd-override.conf.j2"
+target = "/etc/systemd/system/xray.service.d/override.conf"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/logrotate-xray.j2"
+target = "/etc/logrotate.d/xray"
 mode = "template"
 type = "file"
 owner = "root"
@@ -32,9 +41,20 @@ group = "root"
 permissions = "644"
 
 [[hooks]]
-name = "xray-assets"
-script = "xray-assets.sh"
+name = "install-xray"
+script = "install-xray.sh"
+run = "pre"
+kind = "sync"
+note = "Installs or updates Xray using official XTLS installer."
+
+[[hooks]]
+name = "restart-xray"
+script = "restart-xray.sh"
 run = "post"
-kind = "managed-external-files"
-cleanup = "xray-assets-cleanup.sh"
-note = "Downloads geoip.dat/geosite.dat into /etc/xray."
+kind = "generator"
+note = "Reloads systemd and restarts Xray."
+
+[[systemd.system]]
+unit = "xray.service"
+enable = true
+start = true

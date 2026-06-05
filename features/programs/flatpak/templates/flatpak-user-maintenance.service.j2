@@ -1,0 +1,10 @@
+[Unit]
+Description=Maintain user Flatpak installation
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/flatpak update --user -y
+ExecStart=/usr/bin/flatpak uninstall --user --unused -y
+ExecStart=-/usr/bin/flatpak repair --user

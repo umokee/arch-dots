@@ -26,4 +26,16 @@ aur = [
   "mullvad-browser-bin",
   "pgadmin4-bin",
   "openai-codex-bin",
+  "vesktop-bin",
 ]
+
+[[dirs]]
+target = "~/.local/share/applications"
+permissions = "755"
+
+[[files]]
+source = "templates/vesktop-proxy.desktop.j2"
+target = "~/.local/share/applications/vesktop-proxy.desktop"
+mode = "template"
+type = "file"
+permissions = "644"

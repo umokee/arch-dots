@@ -1,27 +1,422 @@
 #!/usr/bin/env bash
 set -euo pipefail
+shopt -s nullglob
 
-echo "== Pacman cache =="
-sudo paccache -rk2 || true
-sudo paccache -ruk0 || true
-
-echo
-echo "== Orphans =="
-orphans="$(pacman -Qdtq || true)"
-if [ -n "$orphans" ]; then
-  echo "$orphans"
-  read -rp "Remove orphans? [y/N] " answer
-  if [[ "$answer" =~ ^[Yy]$ ]]; then
-    echo "$orphans" | sudo pacman -Rns -
-  fi
-else
-  echo "No orphans."
+if [[ "${EUID}" -eq 0 ]]; then
+  echo "Do not run arch-gc with sudo."
+  echo "Run as normal user: arch-gc"
+  echo "The script uses sudo only where system cleanup is needed."
+  exit 1
 fi
 
-echo
-echo "== Pacdiff =="
-sudo pacdiff || true
+XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 
-echo
-echo "== Journal cleanup =="
-sudo journalctl --vacuum-time=14d
+DRY_RUN=0
+YES=0
+
+DO_SYSTEM=1
+DO_USER=1
+DO_DEV=0
+DO_CONTAINERS=0
+DO_TRASH=0
+DO_AGGRESSIVE=0
+
+usage() {
+  cat <<'EOF'
+Usage:
+  arch-gc [options]
+
+Safe default:
+  arch-gc
+
+Options:
+  -n, --dry-run       Show what would be done, but do not delete
+  -y, --yes           Do not ask interactive questions
+  --system-only       Clean only system cache
+  --user-only         Clean only user cache
+  --dev               Clean development caches: pip, uv, npm, pnpm, yarn, go, cargo
+  --containers        Clean Docker/Podman unused cache
+  --trash             Empty user trash
+  --aggressive        Remove old general ~/.cache entries too
+  --all               Enable --dev --containers --trash
+  -h, --help          Show help
+
+Examples:
+  arch-gc
+  arch-gc --dry-run
+  arch-gc --dev
+  arch-gc --containers
+  arch-gc --all
+  arch-gc --all --aggressive
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -n|--dry-run)
+      DRY_RUN=1
+      ;;
+    -y|--yes)
+      YES=1
+      ;;
+    --system-only)
+      DO_SYSTEM=1
+      DO_USER=0
+      ;;
+    --user-only)
+      DO_SYSTEM=0
+      DO_USER=1
+      ;;
+    --dev)
+      DO_DEV=1
+      ;;
+    --containers)
+      DO_CONTAINERS=1
+      ;;
+    --trash)
+      DO_TRASH=1
+      ;;
+    --aggressive)
+      DO_AGGRESSIVE=1
+      ;;
+    --all)
+      DO_DEV=1
+      DO_CONTAINERS=1
+      DO_TRASH=1
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      usage
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+section() {
+  echo
+  echo "== $* =="
+}
+
+run() {
+  echo "+ $*"
+  if [[ "$DRY_RUN" -eq 0 ]]; then
+    "$@"
+  fi
+}
+
+confirm() {
+  local message="$1"
+
+  if [[ "$YES" -eq 1 ]]; then
+    return 0
+  fi
+
+  read -rp "$message [y/N] " answer
+  [[ "$answer" =~ ^[Yy]$ ]]
+}
+
+path_size() {
+  local path="$1"
+
+  if [[ ! -e "$path" ]]; then
+    return 0
+  fi
+
+  if [[ "$path" == /var/* ]]; then
+    sudo du -sh "$path" 2>/dev/null || true
+  else
+    du -sh "$path" 2>/dev/null || true
+  fi
+}
+
+remove_path() {
+  local path="$1"
+
+  if [[ ! -e "$path" ]]; then
+    return 0
+  fi
+
+  path_size "$path"
+
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    echo "Would remove: $path"
+  else
+    rm -rf -- "$path"
+    echo "Removed: $path"
+  fi
+}
+
+remove_path_sudo() {
+  local path="$1"
+
+  if [[ ! -e "$path" ]]; then
+    return 0
+  fi
+
+  path_size "$path"
+
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    echo "Would remove with sudo: $path"
+  else
+    sudo rm -rf -- "$path"
+    echo "Removed: $path"
+  fi
+}
+
+remove_old_dirs() {
+  local base="$1"
+  local days="$2"
+
+  if [[ ! -d "$base" ]]; then
+    return 0
+  fi
+
+  mapfile -t items < <(
+    find "$base" \
+      -mindepth 1 \
+      -maxdepth 1 \
+      -type d \
+      -mtime "+$days" \
+      -print 2>/dev/null || true
+  )
+
+  if [[ "${#items[@]}" -eq 0 ]]; then
+    echo "No old dirs in $base"
+    return 0
+  fi
+
+  for item in "${items[@]}"; do
+    remove_path "$item"
+  done
+}
+
+disk_report() {
+  section "Disk usage"
+  df -h /
+
+  echo
+  echo "-- Main cache locations --"
+  path_size "/var/cache/pacman/pkg"
+  path_size "/var/log/journal"
+  path_size "/var/lib/systemd/coredump"
+  path_size "$XDG_CACHE_HOME"
+  path_size "$XDG_CACHE_HOME/yay"
+  path_size "$XDG_CACHE_HOME/paru"
+  path_size "$XDG_CACHE_HOME/pip"
+  path_size "$XDG_CACHE_HOME/uv"
+  path_size "$XDG_CACHE_HOME/npm"
+  path_size "$XDG_DATA_HOME/Trash"
+  path_size "$XDG_DATA_HOME/containers"
+  path_size "$HOME/.docker"
+}
+
+clean_system() {
+  section "Pacman cache"
+
+  if command -v paccache >/dev/null 2>&1; then
+    # Keep last 2 installed package versions.
+    run sudo paccache -rk2
+
+    # Remove cached packages that are no longer installed.
+    run sudo paccache -ruk0
+  else
+    echo "paccache not found. Install pacman-contrib."
+  fi
+
+  section "System journal"
+  run sudo journalctl --vacuum-time=14d --vacuum-size=500M
+
+  section "System coredumps"
+  if [[ -d /var/lib/systemd/coredump ]]; then
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+      sudo find /var/lib/systemd/coredump -type f -mtime +7 -print 2>/dev/null || true
+    else
+      sudo find /var/lib/systemd/coredump -type f -mtime +7 -print -delete 2>/dev/null || true
+    fi
+  else
+    echo "No /var/lib/systemd/coredump"
+  fi
+
+  section "Orphan packages"
+  mapfile -t orphans < <(pacman -Qdtq 2>/dev/null || true)
+
+  if [[ "${#orphans[@]}" -eq 0 ]]; then
+    echo "No orphans."
+  else
+    printf '%s\n' "${orphans[@]}"
+
+    if confirm "Remove orphan packages?"; then
+      run sudo pacman -Rns "${orphans[@]}"
+    else
+      echo "Skipped orphans."
+    fi
+  fi
+
+  section "Pacdiff"
+  if command -v pacdiff >/dev/null 2>&1; then
+    run sudo pacdiff
+  else
+    echo "pacdiff not found. Install pacman-contrib."
+  fi
+}
+
+clean_user() {
+  section "User thumbnails"
+  remove_path "$XDG_CACHE_HOME/thumbnails"
+
+  section "AUR helper cache"
+
+  # Safe mode: remove old build dirs only.
+  remove_old_dirs "$XDG_CACHE_HOME/yay" 14
+  remove_old_dirs "$XDG_CACHE_HOME/paru" 14
+  remove_old_dirs "$XDG_CACHE_HOME/pikaur" 14
+
+  if [[ "$DO_TRASH" -eq 1 ]]; then
+    section "Trash"
+    remove_path "$XDG_DATA_HOME/Trash/files"
+    remove_path "$XDG_DATA_HOME/Trash/info"
+
+    if [[ "$DRY_RUN" -eq 0 ]]; then
+      mkdir -p "$XDG_DATA_HOME/Trash/files" "$XDG_DATA_HOME/Trash/info"
+    fi
+  fi
+
+  if [[ "$DO_AGGRESSIVE" -eq 1 ]]; then
+    section "Aggressive user cache cleanup"
+
+    echo "This removes old top-level directories from:"
+    echo "  $XDG_CACHE_HOME"
+    echo "Apps may need to rebuild cache after this."
+
+    if confirm "Continue aggressive user cache cleanup?"; then
+      remove_old_dirs "$XDG_CACHE_HOME" 30
+    else
+      echo "Skipped aggressive user cache cleanup."
+    fi
+  fi
+}
+
+clean_dev() {
+  section "Development caches"
+
+  if command -v pip >/dev/null 2>&1; then
+    run pip cache purge || true
+  fi
+
+  if command -v uv >/dev/null 2>&1; then
+    run uv cache clean || true
+  fi
+
+  if command -v npm >/dev/null 2>&1; then
+    run npm cache clean --force || true
+  fi
+
+  if command -v pnpm >/dev/null 2>&1; then
+    run pnpm store prune || true
+  fi
+
+  if command -v yarn >/dev/null 2>&1; then
+    run yarn cache clean || true
+  fi
+
+  if command -v go >/dev/null 2>&1; then
+    run go clean -cache -testcache -modcache || true
+  fi
+
+  section "Cargo cache"
+
+  cargo_dirs=()
+
+  if [[ -n "${CARGO_HOME:-}" ]]; then
+    cargo_dirs+=("$CARGO_HOME")
+  fi
+
+  cargo_dirs+=("$HOME/.cargo")
+  cargo_dirs+=("$XDG_DATA_HOME/cargo")
+
+  seen_cargo_dirs=()
+
+  for cargo_home in "${cargo_dirs[@]}"; do
+    [[ -d "$cargo_home" ]] || continue
+
+    already_seen=0
+    for seen in "${seen_cargo_dirs[@]}"; do
+      if [[ "$seen" == "$cargo_home" ]]; then
+        already_seen=1
+        break
+      fi
+    done
+
+    [[ "$already_seen" -eq 1 ]] && continue
+    seen_cargo_dirs+=("$cargo_home")
+
+    remove_path "$cargo_home/registry/cache"
+    remove_path "$cargo_home/registry/src"
+    remove_path "$cargo_home/git/db"
+    remove_path "$cargo_home/git/checkouts"
+  done
+}
+
+clean_containers() {
+  section "Container cache"
+
+  if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+    echo "-- Docker usage before --"
+    docker system df || true
+
+    run docker builder prune -af --filter "until=168h"
+    run docker system prune -f
+
+    echo "-- Docker usage after --"
+    docker system df || true
+  else
+    echo "Docker unavailable or not accessible."
+  fi
+
+  if command -v podman >/dev/null 2>&1 && podman info >/dev/null 2>&1; then
+    echo "-- Podman usage before --"
+    podman system df || true
+
+    run podman system prune -f
+
+    echo "-- Podman usage after --"
+    podman system df || true
+  else
+    echo "Podman unavailable or not accessible."
+  fi
+}
+
+section "arch-gc start"
+
+if [[ "$DRY_RUN" -eq 1 ]]; then
+  echo "Dry run mode: nothing will be deleted."
+fi
+
+disk_report
+
+if [[ "$DO_SYSTEM" -eq 1 ]]; then
+  clean_system
+fi
+
+if [[ "$DO_USER" -eq 1 ]]; then
+  clean_user
+fi
+
+if [[ "$DO_DEV" -eq 1 ]]; then
+  clean_dev
+fi
+
+if [[ "$DO_CONTAINERS" -eq 1 ]]; then
+  clean_containers
+fi
+
+section "Final disk usage"
+disk_report
+
+section "Done"

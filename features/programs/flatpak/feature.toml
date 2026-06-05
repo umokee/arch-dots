@@ -1,0 +1,137 @@
+id = "programs.flatpak"
+description = "Flatpak runtime, Flathub, portals, overrides, app sync and maintenance"
+
+[packages]
+pacman = [
+  "flatpak",
+  "xdg-desktop-portal",
+  "xdg-desktop-portal-hyprland",
+  "xdg-desktop-portal-gtk",
+  "xdg-user-dirs",
+  "desktop-file-utils",
+  "shared-mime-info",
+]
+aur = []
+
+[[dirs]]
+target = "~/.config/flatpak"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config/environment.d"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config/xdg-desktop-portal"
+permissions = "755"
+
+[[dirs]]
+target = "~/.config/systemd/user"
+permissions = "755"
+
+[[dirs]]
+target = "~/.local/bin"
+permissions = "755"
+
+[[dirs]]
+target = "~/.local/share/flatpak/overrides"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/profile.d"
+permissions = "755"
+
+[[dirs]]
+target = "~/.local/share/applications"
+permissions = "755"
+
+[[files]]
+source = "templates/limo.desktop.j2"
+target = "~/.local/share/applications/limo.desktop"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/flatpak-apps.txt.j2"
+target = "~/.config/flatpak/apps.txt"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/flatpak-user-env.j2"
+target = "~/.config/environment.d/20-flatpak.conf"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/flatpak-exports-profile.sh.j2"
+target = "/etc/profile.d/20-flatpak-exports.sh"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/hyprland-portals.conf.j2"
+target = "~/.config/xdg-desktop-portal/hyprland-portals.conf"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/flatpak-global-overrides.j2"
+target = "~/.local/share/flatpak/overrides/global"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/flatpak-gc.j2"
+target = "~/.local/bin/flatpak-gc"
+mode = "template"
+type = "file"
+permissions = "755"
+
+[[files]]
+source = "templates/flatpak-user-maintenance.service.j2"
+target = "~/.config/systemd/user/flatpak-user-maintenance.service"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[files]]
+source = "templates/flatpak-user-maintenance.timer.j2"
+target = "~/.config/systemd/user/flatpak-user-maintenance.timer"
+mode = "template"
+type = "file"
+permissions = "644"
+
+[[systemd.user]]
+unit = "flatpak-user-maintenance.timer"
+enable = true
+start = true
+
+[[hooks]]
+name = "flatpak-remotes"
+script = "flatpak-remotes.sh"
+run = "post"
+kind = "external-state"
+note = "Adds Flathub as system and user Flatpak remote. Does not remove remotes automatically."
+
+[[hooks]]
+name = "flatpak-sync-apps"
+script = "flatpak-sync-apps.sh"
+run = "post"
+kind = "sync"
+note = "Installs missing user Flatpak apps from ~/.config/flatpak/apps.txt. Does not remove extra apps."
+
+[[hooks]]
+name = "flatpak-refresh"
+script = "flatpak-refresh.sh"
+run = "post"
+kind = "generator"
+note = "Refreshes desktop/mime databases, clears tofi drun cache and restarts portals when possible."

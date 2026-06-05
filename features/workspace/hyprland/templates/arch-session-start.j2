@@ -75,49 +75,8 @@ wait_hyprland
 
 log "importing environment into dbus/systemd user manager"
 
-dbus-update-activation-environment --systemd \
-  DISPLAY \
-  WAYLAND_DISPLAY \
-  HYPRLAND_INSTANCE_SIGNATURE \
-  XDG_SESSION_TYPE \
-  XDG_CURRENT_DESKTOP \
-  XDG_SESSION_DESKTOP \
-  XDG_DESKTOP_PORTAL_DIR \
-  QT_QPA_PLATFORM \
-  QT_QPA_PLATFORMTHEME \
-  QT_WAYLAND_DISABLE_WINDOWDECORATION \
-  GDK_BACKEND \
-  SDL_VIDEODRIVER \
-  CLUTTER_BACKEND \
-  MOZ_ENABLE_WAYLAND \
-  ELECTRON_OZONE_PLATFORM_HINT \
-  PATH \
-  XDG_CONFIG_HOME \
-  XDG_DATA_HOME \
-  XDG_CACHE_HOME \
-  XDG_STATE_HOME || true
-
-systemctl --user import-environment \
-  DISPLAY \
-  WAYLAND_DISPLAY \
-  HYPRLAND_INSTANCE_SIGNATURE \
-  XDG_SESSION_TYPE \
-  XDG_CURRENT_DESKTOP \
-  XDG_SESSION_DESKTOP \
-  XDG_DESKTOP_PORTAL_DIR \
-  QT_QPA_PLATFORM \
-  QT_QPA_PLATFORMTHEME \
-  QT_WAYLAND_DISABLE_WINDOWDECORATION \
-  GDK_BACKEND \
-  SDL_VIDEODRIVER \
-  CLUTTER_BACKEND \
-  MOZ_ENABLE_WAYLAND \
-  ELECTRON_OZONE_PLATFORM_HINT \
-  PATH \
-  XDG_CONFIG_HOME \
-  XDG_DATA_HOME \
-  XDG_CACHE_HOME \
-  XDG_STATE_HOME || true
+dbus-update-activation-environment --systemd --all || true
+systemctl --user import-environment || true
 
 log "reloading user units"
 systemctl --user daemon-reload

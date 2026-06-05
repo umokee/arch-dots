@@ -1,6 +1,5 @@
 set fish_greeting
 
-# Vi mode
 fish_vi_key_bindings
 
 set fish_cursor_default block
@@ -13,28 +12,51 @@ set -g fish_history default
 set -g fish_escape_delay_ms 10
 
 # Colors
-set -g fish_color_normal c0caf5
-set -g fish_color_command 7aa2f7
-set -g fish_color_keyword bb9af7
-set -g fish_color_quote e0af68
-set -g fish_color_redirection 7dcfff
-set -g fish_color_end 9ece6a
-set -g fish_color_error f7768e
-set -g fish_color_param 7dcfff
-set -g fish_color_comment 565f89
-set -g fish_color_selection --background=364a82
-set -g fish_color_search_match --background=364a82
-set -g fish_color_operator 9ece6a
-set -g fish_color_escape bb9af7
-set -g fish_color_autosuggestion 565f89
-set -g fish_color_cancel f7768e
+# set -g fish_color_normal c0caf5
+# set -g fish_color_command 7aa2f7
+# set -g fish_color_keyword bb9af7
+# set -g fish_color_quote e0af68
+# set -g fish_color_redirection 7dcfff
+# set -g fish_color_end 9ece6a
+# set -g fish_color_error f7768e
+# set -g fish_color_param 7dcfff
+# set -g fish_color_comment 565f89
+# set -g fish_color_selection --background=364a82
+# set -g fish_color_search_match --background=364a82
+# set -g fish_color_operator 9ece6a
+# set -g fish_color_escape bb9af7
+# set -g fish_color_autosuggestion 565f89
+# set -g fish_color_cancel f7768e
+# set -g fish_color_valid_path --underline
+
+# set -g fish_pager_color_progress 565f89
+# set -g fish_pager_color_prefix 7aa2f7
+# set -g fish_pager_color_completion c0caf5
+# set -g fish_pager_color_description 565f89
+# set -g fish_pager_color_selected_background --background=364a82
+
+set -g fish_color_normal D7DAE0
+set -g fish_color_command D7DAE0
+set -g fish_color_keyword AAB2BF
+set -g fish_color_quote 8FAF8F
+set -g fish_color_redirection AAB2BF
+set -g fish_color_end 8A9099
+set -g fish_color_error C97B7B
+set -g fish_color_param D7DAE0
+set -g fish_color_comment 5D646F
+set -g fish_color_selection --background=2E333D
+set -g fish_color_search_match --background=2E333D
+set -g fish_color_operator AAB2BF
+set -g fish_color_escape AAB2BF
+set -g fish_color_autosuggestion 5D646F
+set -g fish_color_cancel C97B7B
 set -g fish_color_valid_path --underline
 
-set -g fish_pager_color_progress 565f89
-set -g fish_pager_color_prefix 7aa2f7
-set -g fish_pager_color_completion c0caf5
-set -g fish_pager_color_description 565f89
-set -g fish_pager_color_selected_background --background=364a82
+set -g fish_pager_color_progress 5D646F
+set -g fish_pager_color_prefix AAB2BF
+set -g fish_pager_color_completion D7DAE0
+set -g fish_pager_color_description 5D646F
+set -g fish_pager_color_selected_background --background=2E333D
 
 # Starship
 if type -q starship
@@ -102,3 +124,6 @@ abbr --add acv "/home/user/arch-dots/scripts/archctl -p desktop validate"
 abbr --add acg "/home/user/arch-dots/scripts/archctl -p desktop generate"
 abbr --add acs "/home/user/arch-dots/scripts/archctl -p desktop switch --aur"
 abbr --add acl "/home/user/arch-dots/scripts/archctl -p desktop plan"
+
+bind \cf accept-autosuggestion
+bind -M insert \cf accept-autosuggestion

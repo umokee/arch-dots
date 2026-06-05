@@ -28,7 +28,6 @@ pacman = [
   "python-matplotlib",
   "python-scipy",
   "python-requests",
-  "python-rich",
   "python-typer",
   "python-pydantic",
   "python-sqlalchemy",

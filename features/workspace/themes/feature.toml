@@ -28,7 +28,7 @@ pacman = [
 ]
 aur = [
   "posy-cursors",
-  "tela-circle-icon-theme-blue-git",
+  "tela-circle-icon-theme-grey-git",
   "adw-gtk-theme-git",
 ]
 

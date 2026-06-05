@@ -27,3 +27,6 @@ venv/
 *~
 .idea/
 .vscode/
+
+.archctl-*-backup/
+lib.backup/

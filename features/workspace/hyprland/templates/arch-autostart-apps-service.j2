@@ -1,11 +1,15 @@
 [Unit]
 Description=Autostart desktop applications for Arch Hyprland
-PartOf=graphical-session.target
-After=graphical-session.target kanshi.service quickshell.service swaybg-daemon.service
+PartOf=arch-hyprland-session.target
+After=arch-hyprland-session.target graphical-session.target
+After=kanshi.service quickshell.service swaybg-daemon.service
 
 [Service]
 Type=oneshot
 ExecStart=%h/.local/bin/arch-autostart-apps
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=arch-hyprland-session.target

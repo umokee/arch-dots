@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+backup_dir="/opt/3x-ui/backups"
+stamp="$(date +%Y-%m-%d_%H-%M-%S)"
+archive="$backup_dir/3x-ui-$stamp.tar.gz"
+
+mkdir -p "$backup_dir"
+
+tar -czf "$archive" \
+  -C /opt/3x-ui \
+  db cert
+
+find "$backup_dir" -type f -name '3x-ui-*.tar.gz' -mtime +14 -delete
+
+echo "Backup created: $archive"

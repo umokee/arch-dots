@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DO_USER=1
+DO_SYSTEM=0
+DO_REPAIR=0
+YES=0
+
+usage() {
+  cat <<'EOF'
+Usage:
+  flatpak-gc [options]
+
+Default:
+  flatpak-gc
+
+Options:
+  --user          Maintain user Flatpaks, default
+  --system        Also maintain system Flatpaks
+  --repair        Run flatpak repair
+  -y, --yes       Non-interactive mode
+  -h, --help      Show help
+
+Examples:
+  flatpak-gc
+  flatpak-gc --system
+  flatpak-gc --system --repair
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --user)
+      DO_USER=1
+      ;;
+    --system)
+      DO_SYSTEM=1
+      ;;
+    --repair)
+      DO_REPAIR=1
+      ;;
+    -y|--yes)
+      YES=1
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      usage
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+assume_yes=()
+if [[ "$YES" -eq 1 ]]; then
+  assume_yes=(-y)
+fi
+
+section() {
+  echo
+  echo "== $* =="
+}
+
+section "Flatpak usage before"
+flatpak list --app --columns=application,installation 2>/dev/null || true
+
+if [[ "$DO_USER" -eq 1 ]]; then
+  section "Update user Flatpaks"
+  flatpak update --user "${assume_yes[@]}" || true
+
+  section "Remove unused user runtimes"
+  flatpak uninstall --user --unused "${assume_yes[@]}" || true
+
+  if [[ "$DO_REPAIR" -eq 1 ]]; then
+    section "Repair user Flatpak installation"
+    flatpak repair --user || true
+  fi
+fi
+
+if [[ "$DO_SYSTEM" -eq 1 ]]; then
+  section "Update system Flatpaks"
+  sudo flatpak update --system "${assume_yes[@]}" || true
+
+  section "Remove unused system runtimes"
+  sudo flatpak uninstall --system --unused "${assume_yes[@]}" || true
+
+  if [[ "$DO_REPAIR" -eq 1 ]]; then
+    section "Repair system Flatpak installation"
+    sudo flatpak repair --system || true
+  fi
+fi
+
+section "Flatpak usage after"
+flatpak list --app --columns=application,installation 2>/dev/null || true
+
+section "Done"

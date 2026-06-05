@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import pwd
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +17,8 @@ from arch_config.model import (
 )
 from arch_config.paths import HOOKS_DIR
 
+_PROFILE_HOME: Path | None = None
+
 
 def _unique(items: list[str]) -> list[str]:
     result: list[str] = []
@@ -26,15 +30,70 @@ def _unique(items: list[str]) -> list[str]:
     return result
 
 
+def _resolve_profile_home(profile: dict[str, Any]) -> Path:
+    explicit_home = profile.get("home")
+
+    if isinstance(explicit_home, str) and explicit_home.strip():
+        return Path(explicit_home).expanduser()
+
+    paths = profile.get("paths")
+
+    if isinstance(paths, dict):
+        paths_home = paths.get("home")
+
+        if isinstance(paths_home, str) and paths_home.strip():
+            return Path(paths_home).expanduser()
+
+    username = str(profile.get("username") or "").strip()
+
+    if username:
+        try:
+            return Path(pwd.getpwnam(username).pw_dir)
+        except KeyError:
+            return Path("/home") / username
+
+    sudo_user = os.environ.get("SUDO_USER", "").strip()
+
+    if sudo_user and sudo_user != "root":
+        try:
+            return Path(pwd.getpwnam(sudo_user).pw_dir)
+        except KeyError:
+            return Path("/home") / sudo_user
+
+    return Path.home()
+
+
+def _set_profile_home(profile: dict[str, Any]) -> Path:
+    global _PROFILE_HOME
+
+    home = _resolve_profile_home(profile)
+    _PROFILE_HOME = home
+
+    profile["_home"] = str(home)
+    profile["home"] = str(home)
+
+    paths = profile.setdefault("paths", {})
+
+    if isinstance(paths, dict):
+        paths.setdefault("home", str(home))
+
+    return home
+
+
 def _home() -> Path:
+    if _PROFILE_HOME is not None:
+        return _PROFILE_HOME
+
     return Path.home()
 
 
 def expand_target(value: str) -> Path:
     if value.startswith("~/"):
         return _home() / value[2:]
+
     if value == "~":
         return _home()
+
     return Path(value)
 
 
@@ -100,13 +159,6 @@ def _mounts(profile: dict[str, Any]) -> list[MountItem]:
 
 
 def hook_script_path(feature_root: Path, script: str) -> Path:
-    """
-    Новый путь:
-      features/<group>/<name>/hooks/<script>
-
-    Старый fallback:
-      hooks/<script>
-    """
     local = feature_root / "hooks" / script
 
     if local.exists():
@@ -117,6 +169,7 @@ def hook_script_path(feature_root: Path, script: str) -> Path:
 
 def resolve(profile_name: str) -> ResolvedState:
     profile = load_profile(profile_name)
+    _set_profile_home(profile)
     enabled_features = [str(item) for item in profile.get("features", [])]
     enabled_set = set(enabled_features)
 
@@ -129,7 +182,11 @@ def resolve(profile_name: str) -> ResolvedState:
         state.mounts.append(mount)
         state.systemd.append(
             SystemdItem(
-                scope="system", unit=mount.enabled_unit, enable=True, start=True
+                feature=f"mount:{mount.name}",
+                scope="system",
+                unit=mount.enabled_unit,
+                enable=True,
+                start=True,
             )
         )
 
@@ -206,6 +263,7 @@ def resolve(profile_name: str) -> ResolvedState:
                         continue
                     state.systemd.append(
                         SystemdItem(
+                            feature=feature_id,
                             scope=scope,
                             unit=str(raw["unit"]),
                             enable=bool(raw.get("enable", True)),

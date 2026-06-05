@@ -1,0 +1,9 @@
+module BarWidgets
+
+Clock 1.0 Clock.qml
+Workspaces 1.0 Workspaces.qml
+SystemIndicators 1.0 SystemIndicators.qml
+Battery 1.0 Battery.qml
+Tray 1.0 Tray.qml
+NotificationIndicator 1.0 NotificationIndicator.qml
+OverviewButton 1.0 OverviewButton.qml

@@ -1,3 +1,11 @@
 module Services
 
-HardwareService 1.0 HardwareService.qml
+singleton Theme 1.0 Theme.qml
+singleton Hyprland 1.0 Hyprland.qml
+singleton Audio 1.0 Audio.qml
+singleton Hardware 1.0 Hardware.qml
+singleton Network 1.0 Network.qml
+singleton ClockService 1.0 ClockService.qml
+singleton Notifications 1.0 Notifications.qml
+singleton TrayMenu 1.0 TrayMenu.qml
+singleton Overview 1.0 Overview.qml

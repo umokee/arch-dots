@@ -41,6 +41,7 @@ class LinkItem:
 
 @dataclass(frozen=True)
 class SystemdItem:
+    feature: str
     scope: str
     unit: str
     enable: bool = True

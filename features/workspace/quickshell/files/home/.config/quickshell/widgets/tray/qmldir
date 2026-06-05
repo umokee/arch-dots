@@ -1,0 +1,3 @@
+module TrayWidgets
+
+TrayMenuList 1.0 TrayMenuList.qml

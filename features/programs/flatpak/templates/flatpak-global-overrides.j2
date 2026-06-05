@@ -1,0 +1,15 @@
+# Managed by archctl
+#
+# User-wide Flatpak defaults.
+# Do not grant home/global filesystem access here.
+
+[Context]
+filesystems=xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/fontconfig:ro;xdg-data/fonts:ro;~/.fonts:ro;~/.icons:ro;~/.themes:ro;
+
+[Environment]
+GTK_THEME=adw-gtk3-dark
+QT_QPA_PLATFORM=wayland
+SDL_VIDEODRIVER=wayland
+MOZ_ENABLE_WAYLAND=1
+XCURSOR_THEME=posy-black
+XCURSOR_SIZE=24

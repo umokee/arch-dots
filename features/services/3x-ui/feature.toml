@@ -1,0 +1,95 @@
+id = "services.3x-ui"
+description = "3x-ui panel for managing Xray server"
+
+[[dirs]]
+target = "/opt/3x-ui"
+permissions = "755"
+
+[[dirs]]
+target = "/opt/3x-ui/db"
+permissions = "755"
+
+[[dirs]]
+target = "/opt/3x-ui/cert"
+permissions = "755"
+
+[[dirs]]
+target = "/opt/3x-ui/backups"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/systemd/system"
+permissions = "755"
+
+[[dirs]]
+target = "/usr/local/bin"
+permissions = "755"
+
+[[files]]
+source = "templates/docker-compose.yml.j2"
+target = "/opt/3x-ui/docker-compose.yml"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "600"
+
+[[files]]
+source = "templates/3x-ui.service.j2"
+target = "/etc/systemd/system/3x-ui.service"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/backup-3x-ui.sh.j2"
+target = "/usr/local/bin/backup-3x-ui"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "755"
+
+[[files]]
+source = "templates/backup-3x-ui.service.j2"
+target = "/etc/systemd/system/backup-3x-ui.service"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/backup-3x-ui.timer.j2"
+target = "/etc/systemd/system/backup-3x-ui.timer"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[hooks]]
+name = "install-docker"
+script = "install-docker.sh"
+run = "pre"
+kind = "sync"
+note = "Installs Docker on Ubuntu server."
+
+[[hooks]]
+name = "restart-3x-ui"
+script = "restart-3x-ui.sh"
+run = "post"
+kind = "generator"
+note = "Reloads systemd and starts 3x-ui."
+
+[[systemd.system]]
+unit = "3x-ui.service"
+enable = true
+start = true
+
+[[systemd.system]]
+unit = "backup-3x-ui.timer"
+enable = true
+start = true
