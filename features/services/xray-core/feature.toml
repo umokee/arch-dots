@@ -9,6 +9,14 @@ permissions = "755"
 target = "/usr/local/etc/xray"
 permissions = "755"
 
+[[dirs]]
+target = "/var/log/xray"
+permissions = "755"
+
+[[dirs]]
+target = "/etc/logrotate.d"
+permissions = "755"
+
 [[files]]
 source = "templates/xray-core.env.j2"
 target = "/etc/archctl/xray-core.env"
@@ -18,9 +26,27 @@ owner = "root"
 group = "root"
 permissions = "600"
 
+[[files]]
+source = "templates/config.json.j2"
+target = "/usr/local/etc/xray/config.json"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
+[[files]]
+source = "templates/logrotate-xray.j2"
+target = "/etc/logrotate.d/xray"
+mode = "template"
+type = "file"
+owner = "root"
+group = "root"
+permissions = "644"
+
 [[hooks]]
 name = "apply-xray-core"
 script = "apply-xray-core.sh"
 run = "post"
 kind = "sync"
-note = "Installs Xray-core, disables 3x-ui, generates config.json and client link."
+note = "Installs Xray-core, disables 3x-ui, tests config, restarts service and writes client link."
