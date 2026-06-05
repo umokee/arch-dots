@@ -18,7 +18,7 @@ name = "user"
 
 # ВАЖНО: замени на вывод команды с твоего ПК:
 #   cat ~/.ssh/server.pub
-ssh_public_key = "CHANGE_ME_SSH_PUBLIC_KEY"
+ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8OqzrbBUQOTEw84XyUWRjMa21jEwm4pbqsemXD0oWX user@archlinux"
 
 [ssh]
 port = 22
